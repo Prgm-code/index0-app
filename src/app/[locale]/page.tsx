@@ -4,6 +4,7 @@ import LandingDrag from "@/components/LandingDrag";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function Home() {
   const t = useTranslations();
@@ -25,19 +26,23 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <Link href="/login">
+            <SignInButton mode="modal">
               <Button
                 variant="ghost"
-                className="text-white hover:text-white/80 animate-fade-in animate-delay-100"
+                className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white text-purple-900 hover:bg-white/60"
               >
                 {t("navigation.login")}
               </Button>
-            </Link>
-            <Link href="/signup">
-              <Button className="bg-white text-purple-900 hover:bg-white/90 animate-fade-in animate-delay-200">
+            </SignInButton>
+
+            <SignUpButton mode="modal">
+              <Button
+                variant="ghost"
+                className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white text-purple-900 hover:bg-white/60"
+              >
                 {t("navigation.signup")}
               </Button>
-            </Link>
+            </SignUpButton>
           </div>
         </div>
       </header>

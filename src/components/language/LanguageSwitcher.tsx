@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import US from "country-flag-icons/react/3x2/US";
 import ES from "country-flag-icons/react/3x2/ES";
+
 const LanguageSwitcher = () => {
   const pathname = usePathname();
   const router = useRouter();
@@ -31,7 +32,7 @@ const LanguageSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost">
+        <Button variant="ghost" className="text-white hover:text-white/80">
           <Globe className="h-4 w-4" />
           <span className="ml-2 hidden md:inline-flex">
             {locale === "en" ? "EN" : "ES"}
@@ -39,14 +40,19 @@ const LanguageSwitcher = () => {
           <span className="sr-only">Cambiar idioma</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent
+        align="end"
+        className="backdrop-blur-md bg-white/10 border-white/20"
+      >
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => handleLanguageChange(lang.code)}
-            className={locale === lang.code ? "bg-accent" : ""}
+            className={`${
+              locale === lang.code ? "bg-white/20" : "hover:bg-white/10"
+            } text-white flex items-center justify-between gap-2`}
           >
-            {lang.label}
+            <span>{lang.label}</span>
             {lang.flag}
           </DropdownMenuItem>
         ))}

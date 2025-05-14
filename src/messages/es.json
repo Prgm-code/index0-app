@@ -35,5 +35,13 @@
   "footer": {
     "tagline": "Almacenamiento inteligente para tus documentos",
     "copyright": "Todos los derechos reservados"
+  },
+  "DragAndDrop": {
+    "dropActive": "Suelta los archivos para subirlos",
+    "dropInactive": "Arrastra & suelta tus documentos",
+    "description": "Sube Word, PDF, imágenes y más.",
+    "selectButton": "Seleccionar archivos",
+    "filesReady": "¡Archivos listos!",
+    "uploadingAlert": "📂 Subiendo {count} archivo(s)..."
   }
 }

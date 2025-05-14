@@ -15,6 +15,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/",
   "/es",
+  "/en",
   "/api/uploads/video(/.*)?",
   "/accept-invitation(.*)",
   "/api/webhooks/clerk(.*)",

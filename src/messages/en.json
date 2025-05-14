@@ -35,5 +35,13 @@
   "footer": {
     "tagline": "Intelligent storage for your documents",
     "copyright": "All rights reserved"
+  },
+  "DragAndDrop": {
+    "dropActive": "Drop files to upload",
+    "dropInactive": "Drag & drop your documents",
+    "description": "Upload Word, PDF, images and more.",
+    "selectButton": "Select files",
+    "filesReady": "Files ready!",
+    "uploadingAlert": "📂 Uploading {count} file(s)..."
   }
 }
