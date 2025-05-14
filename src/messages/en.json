@@ -1,0 +1,39 @@
+{
+  "navigation": {
+    "login": "Log in",
+    "signup": "Sign up",
+    "startFree": "Start for free",
+    "seeDemo": "See interactive demo",
+    "about": "About",
+    "pricing": "Pricing",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Intelligent storage for your documents",
+    "subtitle": "Index0 organizes, classifies and extracts information from your documents automatically with AI, allowing you to find what you're looking for in seconds"
+  },
+  "features": {
+    "title": "Main features",
+    "organization": {
+      "title": "Intuitive organization",
+      "description": "Familiar and intuitive folder structure, similar to iOS, to make you feel at home"
+    },
+    "indexing": {
+      "title": "AI Indexing",
+      "description": "Automatic document classification and key information extraction for advanced searches"
+    },
+    "search": {
+      "title": "Powerful search",
+      "description": "Find any document or specific information in seconds, even within content"
+    }
+  },
+  "cta": {
+    "title": "Try all capabilities",
+    "description": "Explore our interactive demo to see how Index0 can transform the way you manage your documents",
+    "button": "Access full demo"
+  },
+  "footer": {
+    "tagline": "Intelligent storage for your documents",
+    "copyright": "All rights reserved"
+  }
+}

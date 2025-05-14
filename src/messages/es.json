@@ -1,0 +1,39 @@
+{
+  "navigation": {
+    "login": "Iniciar sesión",
+    "signup": "Registrarse",
+    "startFree": "Comenzar gratis",
+    "seeDemo": "Ver demo interactiva",
+    "about": "Acerca de",
+    "pricing": "Precios",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "Almacenamiento inteligente para tus documentos",
+    "subtitle": "Index0 organiza, clasifica y extrae información de tus documentos automáticamente con IA, permitiéndote encontrar lo que buscas en segundos"
+  },
+  "features": {
+    "title": "Características principales",
+    "organization": {
+      "title": "Organización intuitiva",
+      "description": "Estructura de carpetas familiar e intuitiva, similar a iOS, para que te sientas como en casa"
+    },
+    "indexing": {
+      "title": "Indexación con IA",
+      "description": "Clasificación automática de documentos y extracción de información clave para búsquedas avanzadas"
+    },
+    "search": {
+      "title": "Búsqueda potente",
+      "description": "Encuentra cualquier documento o información específica en segundos, incluso dentro del contenido"
+    }
+  },
+  "cta": {
+    "title": "Prueba todas las capacidades",
+    "description": "Explora nuestra demo interactiva para ver cómo Index0 puede transformar la forma en que gestionas tus documentos",
+    "button": "Acceder a la demo completa"
+  },
+  "footer": {
+    "tagline": "Almacenamiento inteligente para tus documentos",
+    "copyright": "Todos los derechos reservados"
+  }
+}
