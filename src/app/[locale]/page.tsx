@@ -12,6 +12,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">
       {/* Header */}
+      {/* TODO: add iisloged clerck component to difference between login and signup */}
       <header className="px-6 py-4 border-b border-white/10 bg-black/20 backdrop-blur supports-[backdrop-filter]:bg-black/10 sticky top-0 z-20 animate-fade-down animate-duration-[800ms]">
         <div className="mx-auto container flex items-center justify-between">
           <div className="flex items-center gap-4">
