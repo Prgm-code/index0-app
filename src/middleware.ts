@@ -143,9 +143,7 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     const locale = getPreferredLocale(request);
-    return NextResponse.redirect(
-      new URL(`/${locale}/${userSession}/dashboard`, req.url)
-    );
+    return NextResponse.redirect(new URL(`/${locale}/${userSession}`, req.url));
   }
 
   // 4. Handle locale changes for existing paths

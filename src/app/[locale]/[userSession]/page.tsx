@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,21 +15,315 @@ import {
   Tag,
   Share2,
   Trash2,
+  Plus,
+  X,
 } from "lucide-react";
 import { FileCard } from "@/components/file-card";
 import { FolderCard } from "@/components/folder-card";
 import { FileUploadButton } from "@/components/file-upload-button";
 import { Card } from "@/components/ui/card";
-import { FileBrowser } from "@/components/FileComponents/FileBrowser";
+import { FileBrowser } from "@/components/FileComponents/FileBrowserFolder";
+import { useAuth } from "@clerk/nextjs";
+import { FileIcon } from "@/components/FileComponents/FileIcon";
+import { FileUploader } from "@/components/FileComponents/FileUploader";
+import { formatDistanceToNow } from "date-fns";
+import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+// Define interfaces needed for file management
+export interface FileItem {
+  key: string;
+  size: number;
+  lastModified: string;
+  type: "file";
+  url?: string;
+}
+
+export interface FolderItem {
+  key: string;
+  type: "folder";
+}
+
+type Item = FileItem | FolderItem;
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const { userId } = useAuth();
+
+  // FileBrowser state
+  const [currentPath, setCurrentPath] = useState("");
+  const [items, setItems] = useState<Item[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+  const [isDeletingItem, setIsDeletingItem] = useState<string | null>(null);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Load files from API
+  const loadFiles = async (prefix: string) => {
+    if (!userId) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Format the prefix correctly
+      const normalizedPrefix = prefix.replace(/\/+/g, "/");
+
+      const response = await fetch(
+        `/api/files/list?prefix=${encodeURIComponent(normalizedPrefix)}`
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to load files");
+      }
+
+      // Filter items for the current directory
+      const filteredItems = [...data.folders, ...data.files]
+        .filter((item: Item) => {
+          // Ensure item belongs to current user
+          if (!item.key.startsWith(`${userId}/`)) {
+            return false;
+          }
+
+          // Normalize the key
+          const normalizedKey = item.key.replace(/\/+/g, "/");
+
+          // For root directory, show only first level items
+          if (normalizedPrefix === `${userId}/`) {
+            const relativePath = normalizedKey.replace(`${userId}/`, "");
+            return (
+              !relativePath.includes("/") ||
+              (item.type === "folder" && relativePath.split("/").length === 2)
+            );
+          }
+
+          // For subdirectories, show only current level items
+          const relativeToCurrentPath = normalizedKey.replace(
+            normalizedPrefix,
+            ""
+          );
+          return (
+            !relativeToCurrentPath.includes("/") ||
+            (item.type === "folder" &&
+              relativeToCurrentPath.split("/").length === 2)
+          );
+        })
+        .map((item: Item) => ({
+          ...item,
+          key: item.key.replace(/\/+/g, "/"),
+        }));
+
+      setItems(filteredItems);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load files");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Load files on component mount and when path changes
+  useEffect(() => {
+    if (userId) {
+      const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
+      loadFiles(fullPath);
+    }
+  }, [currentPath, userId]);
+
+  // Get presigned URL for file download
+  const getPresignedUrl = async (key: string) => {
+    try {
+      const response = await fetch(
+        `/api/files/presigned?key=${encodeURIComponent(key)}`
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate URL");
+      }
+
+      return data.url;
+    } catch (err) {
+      console.error("Error getting presigned URL:", err);
+      setError(err instanceof Error ? err.message : "Failed to generate URL");
+      return null;
+    }
+  };
+
+  // Handle folder click
+  const handleFolderClick = (folder: FolderItem) => {
+    const folderName = folder.key.split("/").filter(Boolean).pop() || "";
+
+    // Build the new path
+    let newPath;
+    if (currentPath) {
+      newPath = `${currentPath}/${folderName}`;
+    } else {
+      newPath = folderName;
+    }
+
+    // Format path correctly
+    newPath = newPath.replace(/^\/+|\/+$/g, "");
+    setCurrentPath(newPath);
+  };
+
+  // Handle file click
+  const handleFileClick = async (file: FileItem) => {
+    const url = await getPresignedUrl(file.key);
+    if (url) {
+      window.open(url, "_blank");
+    }
+  };
+
+  // Format file size for display
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB", "TB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+  };
+
+  // Handle upload completion
+  const handleUploadComplete = () => {
+    const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
+    loadFiles(fullPath);
+  };
+
+  // Handle upload errors
+  const handleUploadError = (error: string) => {
+    setError(error);
+  };
+
+  // Create a new folder
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) {
+      setError("Folder name is required");
+      return;
+    }
+
+    try {
+      setError(null);
+
+      // Build folder path
+      let folderPath;
+      if (!currentPath) {
+        folderPath = `${newFolderName}/`;
+      } else {
+        folderPath = `${currentPath}/${newFolderName}/`;
+      }
+
+      // Remove userId if present
+      folderPath = folderPath.replace(`${userId}/`, "");
+
+      const response = await fetch("/api/folders/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          path: folderPath,
+          reportId: userId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create folder");
+      }
+
+      setNewFolderName("");
+      setIsPopoverOpen(false);
+      const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
+      loadFiles(fullPath);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create folder");
+    }
+  };
+
+  // Navigate to parent folder
+  const navigateToParent = () => {
+    if (!currentPath) return;
+
+    const pathParts = currentPath.split("/").filter(Boolean);
+    pathParts.pop();
+    const parentPath = pathParts.join("/");
+
+    setCurrentPath(parentPath);
+  };
+
+  // Delete a file or folder
+  const handleDelete = async (item: Item, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    const displayName = (() => {
+      if (item.key === `${userId}/`) {
+        return "Home";
+      }
+      const relativePath = item.key.replace(currentPath, "");
+      const parts = relativePath.split("/").filter(Boolean);
+      return parts.length > 0
+        ? parts[0]
+        : item.key.split("/").filter(Boolean).pop() || "";
+    })();
+
+    if (!confirm(`Are you sure you want to delete ${displayName}?`)) {
+      return;
+    }
+
+    try {
+      setIsDeletingItem(item.key);
+      setError(null);
+
+      const endpoint =
+        item.type === "folder"
+          ? `/api/folders/delete?prefix=${encodeURIComponent(item.key)}`
+          : `/api/files/delete?key=${encodeURIComponent(item.key)}`;
+
+      const response = await fetch(endpoint, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `Failed to delete ${item.type}`);
+      }
+
+      const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
+      loadFiles(fullPath);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : `Failed to delete ${item.type}`
+      );
+    } finally {
+      setIsDeletingItem(null);
+    }
+  };
+
+  // Filter items by search term
+  const filteredItems = items.filter((item) => {
+    const itemName = item.key.split("/").pop() || "";
+    return itemName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  // A custom handler to refresh files after upload from the FileUploadButton
+  const handleFileUploaded = () => {
+    const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
+    loadFiles(fullPath);
+  };
 
   return (
-    <Card className="w-full  flex ">
+    <Card className="w-full flex">
       {/* Main content */}
-
-      <FileBrowser reportId={"1"} />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top navigation */}
         <header className="border-b bg-background">
@@ -38,8 +332,10 @@ export default function Dashboard() {
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Buscar documentos..."
+                placeholder="Search documents..."
                 className="h-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-2">
@@ -69,111 +365,221 @@ export default function Dashboard() {
                   }`}
                 />
               </Button>
-              <FileUploadButton />
-              <Button variant="outline" size="sm">
-                <FolderPlus className="h-4 w-4 mr-2" />
-                Nueva carpeta
-              </Button>
+              <FileUploadButton
+                onUploadComplete={handleFileUploaded}
+                userId={userId}
+                currentPath={currentPath}
+              />
+              <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <FolderPlus className="h-4 w-4 mr-2" />
+                    New folder
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleCreateFolder();
+                    }}
+                  >
+                    <div className="grid gap-4">
+                      <div className="space-y-2">
+                        <h4 className="font-medium leading-none">New folder</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Enter a name for the new folder
+                        </p>
+                      </div>
+                      <div className="grid gap-2">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <Label
+                            htmlFor="folderName"
+                            className="col-span-4 hidden"
+                          >
+                            Name
+                          </Label>
+                          <Input
+                            id="folderName"
+                            value={newFolderName}
+                            placeholder="Folder name"
+                            className="col-span-4"
+                            onChange={(e) => setNewFolderName(e.target.value)}
+                            autoFocus
+                          />
+                        </div>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => {
+                              setNewFolderName("");
+                              setIsPopoverOpen(false);
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                          <Button type="submit">Create</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
           {/* Breadcrumb */}
           <div className="flex items-center px-4 py-2 text-sm">
-            <Link
-              href="/dashboard"
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Mis documentos
-            </Link>
+            <div className="flex items-center space-x-2">
+              <span
+                onClick={() => setCurrentPath("")}
+                className="cursor-pointer hover:underline text-muted-foreground hover:text-foreground"
+              >
+                My Documents
+              </span>
+              {currentPath
+                .split("/")
+                .filter(Boolean)
+                .map((part, index, array) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    <span
+                      className="cursor-pointer hover:underline text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        const path = array.slice(0, index + 1).join("/");
+                        setCurrentPath(path);
+                      }}
+                    >
+                      {part}
+                    </span>
+                  </div>
+                ))}
+            </div>
           </div>
         </header>
 
         {/* Content area */}
         <main className="flex-1 overflow-auto p-4">
-          {/* Recently added section */}
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">
-              Agregados recientemente
-            </h2>
-            <div
-              className={
-                viewMode === "grid"
-                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-                  : "space-y-2"
-              }
-            >
-              {[1, 2, 3, 4, 5].map((i) => (
-                <FileCard
-                  key={i}
-                  name={`Documento ${i}.pdf`}
-                  type="pdf"
-                  size="2.4 MB"
-                  updatedAt="Hace 2 horas"
-                  viewMode={viewMode}
-                />
-              ))}
+          {error && (
+            <div className="p-4 bg-red-100 text-red-600 rounded-md mb-4">
+              <p>{error}</p>
             </div>
-          </section>
+          )}
 
-          {/* Folders section */}
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Carpetas</h2>
-            <div
-              className={
-                viewMode === "grid"
-                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-                  : "space-y-2"
-              }
-            >
-              {[
-                "Trabajo",
-                "Personal",
-                "Proyectos",
-                "Documentos",
-                "Facturas",
-              ].map((name, i) => (
-                <FolderCard
-                  key={i}
-                  name={name}
-                  itemCount={Math.floor(Math.random() * 20) + 1}
-                  viewMode={viewMode}
-                />
-              ))}
-            </div>
-          </section>
-
-          {/* All files section */}
+          {/* Files and folders section */}
           <section>
-            <h2 className="text-lg font-semibold mb-4">Todos los archivos</h2>
-            <div
-              className={
-                viewMode === "grid"
-                  ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-                  : "space-y-2"
-              }
-            >
-              {[
-                { name: "Informe trimestral.pdf", type: "pdf" },
-                { name: "Presentación cliente.pptx", type: "ppt" },
-                { name: "Presupuesto 2023.xlsx", type: "excel" },
-                { name: "Contrato.docx", type: "word" },
-                { name: "Notas reunión.txt", type: "text" },
-                { name: "Diagrama.png", type: "image" },
-                { name: "Manual usuario.pdf", type: "pdf" },
-                { name: "Calendario.xlsx", type: "excel" },
-                { name: "Propuesta.docx", type: "word" },
-                { name: "Factura-001.pdf", type: "pdf" },
-              ].map((file, i) => (
-                <FileCard
-                  key={i}
-                  name={file.name}
-                  type={file.type}
-                  size={`${(Math.random() * 10).toFixed(1)} MB`}
-                  updatedAt={`Hace ${Math.floor(Math.random() * 30) + 1} días`}
-                  viewMode={viewMode}
-                />
-              ))}
-            </div>
+            <h2 className="text-lg font-semibold mb-4">Files and Folders</h2>
+
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : filteredItems.length === 0 ? (
+              <div className="p-4 text-center">No files or folders found</div>
+            ) : (
+              <div
+                className={
+                  viewMode === "grid"
+                    ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
+                    : "space-y-2"
+                }
+              >
+                {filteredItems.map((item) => (
+                  <div
+                    key={item.key}
+                    onClick={() =>
+                      item.type === "folder"
+                        ? handleFolderClick(item as FolderItem)
+                        : handleFileClick(item as FileItem)
+                    }
+                    className={`relative cursor-pointer group ${
+                      viewMode === "grid"
+                        ? "flex flex-col items-center p-4 border rounded-lg hover:shadow-md"
+                        : "flex items-center p-4 border rounded-lg hover:shadow-md"
+                    }`}
+                  >
+                    {/* Icon */}
+                    {item.type === "folder" ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className={
+                          viewMode === "grid" ? "h-12 w-12 mb-2" : "h-6 w-6"
+                        }
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+                        />
+                      </svg>
+                    ) : (
+                      <FileIcon
+                        filename={item.key}
+                        className={
+                          viewMode === "grid" ? "h-12 w-12 mb-2" : "h-6 w-6"
+                        }
+                      />
+                    )}
+
+                    {/* Info */}
+                    <div
+                      className={
+                        viewMode === "grid"
+                          ? "text-center w-full"
+                          : "ml-3 flex-1"
+                      }
+                    >
+                      <p
+                        className={`text-sm font-medium truncate ${
+                          viewMode === "grid" ? "text-center" : ""
+                        }`}
+                      >
+                        {(() => {
+                          const fullName =
+                            item.key.split("/").filter(Boolean).pop() || "";
+                          return item.type === "folder"
+                            ? fullName.replace(/\/$/, "")
+                            : fullName;
+                        })()}
+                      </p>
+                      {item.type === "file" && (
+                        <p className="text-xs text-muted-foreground truncate">
+                          {formatFileSize((item as FileItem).size)} •{" "}
+                          {formatDistanceToNow(
+                            new Date((item as FileItem).lastModified),
+                            {
+                              addSuffix: true,
+                            }
+                          )}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Delete button */}
+                    <button
+                      onClick={(e) => handleDelete(item, e)}
+                      className={`p-2 rounded-full absolute top-1 right-1 ${
+                        isDeletingItem === item.key
+                          ? "opacity-50 cursor-not-allowed"
+                          : "opacity-0 group-hover:opacity-100"
+                      }`}
+                      disabled={isDeletingItem === item.key}
+                    >
+                      {isDeletingItem === item.key ? (
+                        <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
         </main>
       </div>
