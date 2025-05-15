@@ -8,6 +8,53 @@
     "pricing": "Pricing",
     "contact": "Contact"
   },
+  "menu": {
+    "main": "Main Navigation",
+    "plan": "Enterprise",
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "documents": {
+      "title": "Documents",
+      "upload": "Upload Documents",
+      "search": "Search Documents",
+      "view": "View Documents",
+      "list": "My Documents",
+      "recent": "Recent",
+      "favorites": "Favorites",
+      "shared": "Shared",
+      "tags": "Tags",
+      "trash": "Trash"
+    },
+    "folders": {
+      "title": "My Folders",
+      "work": "Work",
+      "personal": "Personal",
+      "projects": "Projects"
+    },
+    "shipments": {
+      "title": "Shipments",
+      "orders": "Orders",
+      "tracking": "Tracking"
+    },
+    "orders": {
+      "title": "Orders",
+      "listOrders": "List Orders",
+      "search": "Search Orders"
+    },
+    "reports": {
+      "title": "Reports",
+      "monthly": "Monthly Report",
+      "annual": "Annual Report",
+      "statistics": "Statistics"
+    },
+    "settings": "Settings"
+  },
+  "breadcrumb": {
+    "platform": "Platform",
+    "navigation": "Navigation",
+    "ordersList": "Orders List",
+    "moreOptions": "More Options"
+  },
   "hero": {
     "title": "Intelligent storage for your documents",
     "subtitle": "Index0 organizes, classifies and extracts information from your documents automatically with AI, allowing you to find what you're looking for in seconds"

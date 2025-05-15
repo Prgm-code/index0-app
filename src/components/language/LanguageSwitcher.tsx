@@ -32,7 +32,10 @@ const LanguageSwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="text-white hover:text-white/80">
+        <Button
+          variant="ghost"
+          className="text-gray-800 hover:text-gray-900 dark:text-white dark:hover:text-white/80"
+        >
           <Globe className="h-4 w-4" />
           <span className="ml-2 hidden md:inline-flex">
             {locale === "en" ? "EN" : "ES"}
@@ -42,15 +45,17 @@ const LanguageSwitcher = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="backdrop-blur-md bg-white/10 border-white/20"
+        className="backdrop-blur-md bg-white/80 dark:bg-black/60 border-gray-200 dark:border-white/20"
       >
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onClick={() => handleLanguageChange(lang.code)}
             className={`${
-              locale === lang.code ? "bg-white/20" : "hover:bg-white/10"
-            } text-white flex items-center justify-between gap-2`}
+              locale === lang.code
+                ? "bg-gray-100 dark:bg-white/20"
+                : "hover:bg-gray-50 dark:hover:bg-white/10"
+            } text-gray-800 dark:text-white flex items-center justify-between gap-2`}
           >
             <span>{lang.label}</span>
             {lang.flag}

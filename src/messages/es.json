@@ -8,6 +8,53 @@
     "pricing": "Precios",
     "contact": "Contacto"
   },
+  "menu": {
+    "main": "Navegación Principal",
+    "plan": "Empresarial",
+    "home": "Inicio",
+    "dashboard": "Panel",
+    "documents": {
+      "title": "Documentos",
+      "upload": "Subir Documentos",
+      "search": "Buscar Documentos",
+      "view": "Ver Documentos",
+      "list": "Mis Documentos",
+      "recent": "Recientes",
+      "favorites": "Favoritos",
+      "shared": "Compartidos",
+      "tags": "Etiquetas",
+      "trash": "Papelera"
+    },
+    "folders": {
+      "title": "Mis Carpetas",
+      "work": "Trabajo",
+      "personal": "Personal",
+      "projects": "Proyectos"
+    },
+    "shipments": {
+      "title": "Envíos",
+      "orders": "Órdenes",
+      "tracking": "Seguimiento"
+    },
+    "orders": {
+      "title": "Órdenes",
+      "listOrders": "Lista de Órdenes",
+      "search": "Buscar Órdenes"
+    },
+    "reports": {
+      "title": "Informes",
+      "monthly": "Informe Mensual",
+      "annual": "Informe Anual",
+      "statistics": "Estadísticas"
+    },
+    "settings": "Configuración"
+  },
+  "breadcrumb": {
+    "platform": "Plataforma",
+    "navigation": "Navegación",
+    "ordersList": "Lista de Órdenes",
+    "moreOptions": "Más Opciones"
+  },
   "hero": {
     "title": "Almacenamiento inteligente para tus documentos",
     "subtitle": "Index0 organiza, clasifica y extrae información de tus documentos automáticamente con IA, permitiéndote encontrar lo que buscas en segundos"
@@ -37,8 +84,8 @@
     "copyright": "Todos los derechos reservados"
   },
   "DragAndDrop": {
-    "dropActive": "Suelta los archivos para subirlos",
-    "dropInactive": "Arrastra & suelta tus documentos",
+    "dropActive": "Suelta los archivos para subir",
+    "dropInactive": "Arrastra y suelta tus documentos",
     "description": "Sube Word, PDF, imágenes y más.",
     "selectButton": "Seleccionar archivos",
     "filesReady": "¡Archivos listos!",

@@ -36,6 +36,16 @@ export default async function RootLayout({
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
+
+  // Load messages for the current locale
+  let messages;
+  try {
+    messages = (await import(`../../messages/${locale}.json`)).default;
+  } catch (error) {
+    console.error(`Could not load messages for locale ${locale}`, error);
+    notFound();
+  }
+
   return (
     <ClerkProvider localization={locale === "es" ? esMX : enUS}>
       <html lang={locale} suppressHydrationWarning>
@@ -48,7 +58,9 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            <NextIntlClientProvider locale={locale} messages={messages}>
+              {children}
+            </NextIntlClientProvider>
 
             <Toaster />
           </ThemeProvider>

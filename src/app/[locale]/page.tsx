@@ -37,7 +37,10 @@ export default function Home() {
               <UserButton />
             </SignedIn>
             <SignedOut>
-              <SignInButton mode="modal">
+              <SignInButton
+                mode="modal"
+                fallbackRedirectUrl="/redirect-after-signin"
+              >
                 <Button
                   variant="ghost"
                   className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white text-purple-900 hover:bg-white/60"
@@ -46,7 +49,10 @@ export default function Home() {
                 </Button>
               </SignInButton>
 
-              <SignUpButton mode="modal">
+              <SignUpButton
+                mode="modal"
+                fallbackRedirectUrl="/redirect-after-signin"
+              >
                 <Button
                   variant="ghost"
                   className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white text-purple-900 hover:bg-white/60"
