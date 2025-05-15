@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +19,6 @@ export default async function FilePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const [isStarred, setIsStarred] = useState(false);
   const { id } = await params;
 
   // Mock file data
@@ -69,12 +67,12 @@ export default async function FilePage({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsStarred(!isStarred)}
+              onClick={() => console.log("starred")}
             >
               <Star
                 className={cn(
                   "h-5 w-5",
-                  isStarred ? "text-yellow-400 fill-yellow-400" : ""
+                  true ? "text-yellow-400 fill-yellow-400" : ""
                 )}
               />
             </Button>
