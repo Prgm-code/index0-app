@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import LandingDrag from "@/components/LandingDrag";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import {
   SignedIn,
@@ -12,8 +12,8 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 
-export default function Home() {
-  const t = useTranslations();
+export default async function Home() {
+  const t = await getTranslations();
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">

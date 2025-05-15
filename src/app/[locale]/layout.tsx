@@ -33,22 +33,14 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }>) {
   const { locale } = await params;
+  console.log("locale", locale);
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
-  // Load messages for the current locale
-  let messages;
-  try {
-    messages = (await import(`../../messages/${locale}.json`)).default;
-  } catch (error) {
-    console.error(`Could not load messages for locale ${locale}`, error);
-    notFound();
-  }
-
   return (
-    <ClerkProvider localization={locale === "es" ? esMX : enUS}>
-      <html lang={locale} suppressHydrationWarning>
+    <ClerkProvider localization={esMX}>
+      <html lang={"es"} suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
         >
@@ -58,9 +50,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <NextIntlClientProvider locale={locale} messages={messages}>
-              {children}
-            </NextIntlClientProvider>
+            <NextIntlClientProvider>{children}</NextIntlClientProvider>
 
             <Toaster />
           </ThemeProvider>

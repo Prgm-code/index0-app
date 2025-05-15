@@ -13,8 +13,8 @@ const DEFAULT_LOCALE = "es";
 const intlMiddleware = createIntlMiddleware(routing);
 
 // Route matchers
-const isClientDashboardRoute = createRouteMatcher(["/:locale/(.*)"]);
-const isProtectedRoute = createRouteMatcher(["/:locale/admin(.*)"]);
+// const isClientDashboardRoute = createRouteMatcher(["/:locale/(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/:locale/(.*)"]);
 const isApiRoute = createRouteMatcher(["/api/(.*)"]);
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
@@ -165,12 +165,12 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 
-  // 5. Protección del dashboard de clientes
-  if (isClientDashboardRoute(request)) {
-    await auth.protect();
-    console.log("Client Dashboard accessed");
-    return NextResponse.next();
-  }
+  // // 5. Protección del dashboard de clientes
+  // if (isClientDashboardRoute(request)) {
+  //   await auth.protect();
+  //   console.log("Client Dashboard accessed");
+  //   return NextResponse.next();
+  // }
 
   // 6. Protección por defecto y manejo de i18n
   await auth.protect();

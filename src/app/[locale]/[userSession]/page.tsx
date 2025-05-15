@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,7 @@ import { FileCard } from "@/components/file-card";
 import { FolderCard } from "@/components/folder-card";
 import { FileUploadButton } from "@/components/file-upload-button";
 import { Card } from "@/components/ui/card";
+import { FileBrowser } from "@/components/FileComponents/FileBrowser";
 
 export default function Dashboard() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -28,6 +28,8 @@ export default function Dashboard() {
   return (
     <Card className="w-full  flex ">
       {/* Main content */}
+
+      <FileBrowser reportId={"1"} />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top navigation */}
         <header className="border-b bg-background">
