@@ -1,19 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, Download, Share2, Star, Trash2, FileText, Tag, MessageSquare } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  ChevronLeft,
+  Download,
+  Share2,
+  Star,
+  Trash2,
+  FileText,
+  Tag,
+  MessageSquare,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
-export default function FilePage({ params }: { params: { id: string } }) {
-  const [isStarred, setIsStarred] = useState(false)
+export default async function FilePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const [isStarred, setIsStarred] = useState(false);
+  const { id } = await params;
 
   // Mock file data
   const file = {
-    id: params.id,
+    id: id,
     name: "Informe trimestral Q1 2023.pdf",
     type: "pdf",
     size: "2.4 MB",
@@ -29,9 +43,16 @@ export default function FilePage({ params }: { params: { id: string } }) {
         { type: "Cantidad", value: "$1.2M en ingresos" },
         { type: "Porcentaje", value: "15% de crecimiento" },
       ],
-      keywords: ["finanzas", "trimestral", "ingresos", "gastos", "proyecciones", "crecimiento"],
+      keywords: [
+        "finanzas",
+        "trimestral",
+        "ingresos",
+        "gastos",
+        "proyecciones",
+        "crecimiento",
+      ],
     },
-  }
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -47,8 +68,17 @@ export default function FilePage({ params }: { params: { id: string } }) {
             <h1 className="text-xl font-semibold truncate">{file.name}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => setIsStarred(!isStarred)}>
-              <Star className={cn("h-5 w-5", isStarred ? "text-yellow-400 fill-yellow-400" : "")} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsStarred(!isStarred)}
+            >
+              <Star
+                className={cn(
+                  "h-5 w-5",
+                  isStarred ? "text-yellow-400 fill-yellow-400" : ""
+                )}
+              />
             </Button>
             <Button variant="ghost" size="icon">
               <Share2 className="h-5 w-5" />
@@ -73,7 +103,9 @@ export default function FilePage({ params }: { params: { id: string } }) {
                 <div className="text-center p-8">
                   <FileText className="h-16 w-16 mx-auto mb-4 text-red-500" />
                   <h3 className="text-lg font-medium mb-2">{file.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{file.size}</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {file.size}
+                  </p>
                   <Button>
                     <Download className="h-4 w-4 mr-2" />
                     Descargar
@@ -94,13 +126,17 @@ export default function FilePage({ params }: { params: { id: string } }) {
                   </TabsList>
                 </div>
                 <TabsContent value="summary" className="p-4">
-                  <p className="text-sm leading-relaxed">{file.extractedContent.summary}</p>
+                  <p className="text-sm leading-relaxed">
+                    {file.extractedContent.summary}
+                  </p>
                 </TabsContent>
                 <TabsContent value="entities" className="p-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {file.extractedContent.entities.map((entity, index) => (
                       <div key={index} className="bg-accent/50 p-3 rounded-md">
-                        <p className="text-xs font-medium text-muted-foreground mb-1">{entity.type}</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          {entity.type}
+                        </p>
                         <p className="font-medium">{entity.value}</p>
                       </div>
                     ))}
@@ -164,19 +200,25 @@ export default function FilePage({ params }: { params: { id: string } }) {
 
             {/* Related files */}
             <div className="bg-white border rounded-lg shadow-sm p-4">
-              <h2 className="text-lg font-semibold mb-4">Archivos relacionados</h2>
+              <h2 className="text-lg font-semibold mb-4">
+                Archivos relacionados
+              </h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors">
                   <FileText className="h-5 w-5 text-red-500" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">Informe trimestral Q4 2022.pdf</p>
+                    <p className="font-medium text-sm truncate">
+                      Informe trimestral Q4 2022.pdf
+                    </p>
                     <p className="text-xs text-muted-foreground">1.8 MB</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-2 hover:bg-accent rounded-md transition-colors">
                   <FileText className="h-5 w-5 text-red-500" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">Proyecciones 2023.pdf</p>
+                    <p className="font-medium text-sm truncate">
+                      Proyecciones 2023.pdf
+                    </p>
                     <p className="text-xs text-muted-foreground">3.2 MB</p>
                   </div>
                 </div>
@@ -220,5 +262,5 @@ export default function FilePage({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
