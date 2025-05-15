@@ -215,7 +215,9 @@ export default function AdminLayout({
                     <BreadcrumbPage className="text-gray-800 dark:text-white/80">
                       {tBreadcrumb("navigation")}
                     </BreadcrumbPage>
-                    <BreadcrumbSeparator className="hidden md:block text-gray-600/60 dark:text-white/60" />
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block text-gray-600/60 dark:text-white/60" />
+                  <BreadcrumbItem className="text-gray-800 dark:text-white/80">
                     <BreadcrumbPage className="text-gray-800 dark:text-white/80">
                       {tBreadcrumb("ordersList")}
                     </BreadcrumbPage>
