@@ -90,5 +90,24 @@
     "selectButton": "Seleccionar archivos",
     "filesReady": "¡Archivos listos!",
     "uploadingAlert": "📂 Subiendo {count} archivo(s)..."
+  },
+  "dashboard": {
+    "searchPlaceholder": "Buscar documentos...",
+    "newFolder": "Nueva carpeta",
+    "newFolderTitle": "Nueva carpeta",
+    "newFolderDescription": "Ingresa un nombre para la nueva carpeta",
+    "folderNamePlaceholder": "Nombre de carpeta",
+    "cancel": "Cancelar",
+    "create": "Crear",
+    "myDocuments": "Mis Documentos",
+    "filesAndFolders": "Archivos y Carpetas",
+    "noFilesFound": "No se encontraron archivos o carpetas",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar {name}?",
+    "folderNameRequired": "El nombre de la carpeta es obligatorio",
+    "failedToLoadFiles": "Error al cargar archivos",
+    "failedToCreateFolder": "Error al crear carpeta",
+    "failedToDelete": "Error al eliminar {type}",
+    "failedToGenerateUrl": "Error al generar URL",
+    "home": "Inicio"
   }
 }

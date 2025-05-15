@@ -90,5 +90,24 @@
     "selectButton": "Select files",
     "filesReady": "Files ready!",
     "uploadingAlert": "📂 Uploading {count} file(s)..."
+  },
+  "dashboard": {
+    "searchPlaceholder": "Search documents...",
+    "newFolder": "New folder",
+    "newFolderTitle": "New folder",
+    "newFolderDescription": "Enter a name for the new folder",
+    "folderNamePlaceholder": "Folder name",
+    "cancel": "Cancel",
+    "create": "Create",
+    "myDocuments": "My Documents",
+    "filesAndFolders": "Files and Folders",
+    "noFilesFound": "No files or folders found",
+    "confirmDelete": "Are you sure you want to delete {name}?",
+    "folderNameRequired": "Folder name is required",
+    "failedToLoadFiles": "Failed to load files",
+    "failedToCreateFolder": "Failed to create folder",
+    "failedToDelete": "Failed to delete {type}",
+    "failedToGenerateUrl": "Failed to generate URL",
+    "home": "Home"
   }
 }

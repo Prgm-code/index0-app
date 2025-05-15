@@ -33,6 +33,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useTranslations } from "next-intl";
 
 // Define interfaces needed for file management
 export interface FileItem {
@@ -51,6 +52,7 @@ export interface FolderItem {
 type Item = FileItem | FolderItem;
 
 export default function Dashboard() {
+  const t = useTranslations("dashboard");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { userId } = useAuth();
 
@@ -82,7 +84,7 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to load files");
+        throw new Error(data.error || t("failedToLoadFiles"));
       }
 
       // Filter items for the current directory
@@ -123,7 +125,7 @@ export default function Dashboard() {
 
       setItems(filteredItems);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load files");
+      setError(err instanceof Error ? err.message : t("failedToLoadFiles"));
     } finally {
       setIsLoading(false);
     }
@@ -146,13 +148,13 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate URL");
+        throw new Error(data.error || t("failedToGenerateUrl"));
       }
 
       return data.url;
     } catch (err) {
       console.error("Error getting presigned URL:", err);
-      setError(err instanceof Error ? err.message : "Failed to generate URL");
+      setError(err instanceof Error ? err.message : t("failedToGenerateUrl"));
       return null;
     }
   };
@@ -205,7 +207,7 @@ export default function Dashboard() {
   // Create a new folder
   const handleCreateFolder = async () => {
     if (!newFolderName.trim()) {
-      setError("Folder name is required");
+      setError(t("folderNameRequired"));
       return;
     }
 
@@ -237,7 +239,7 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create folder");
+        throw new Error(data.error || t("failedToCreateFolder"));
       }
 
       setNewFolderName("");
@@ -245,7 +247,7 @@ export default function Dashboard() {
       const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
       loadFiles(fullPath);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create folder");
+      setError(err instanceof Error ? err.message : t("failedToCreateFolder"));
     }
   };
 
@@ -266,7 +268,7 @@ export default function Dashboard() {
 
     const displayName = (() => {
       if (item.key === `${userId}/`) {
-        return "Home";
+        return t("home");
       }
       const relativePath = item.key.replace(currentPath, "");
       const parts = relativePath.split("/").filter(Boolean);
@@ -275,7 +277,7 @@ export default function Dashboard() {
         : item.key.split("/").filter(Boolean).pop() || "";
     })();
 
-    if (!confirm(`Are you sure you want to delete ${displayName}?`)) {
+    if (!confirm(t("confirmDelete", { name: displayName }))) {
       return;
     }
 
@@ -295,14 +297,16 @@ export default function Dashboard() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || `Failed to delete ${item.type}`);
+        throw new Error(data.error || t("failedToDelete", { type: item.type }));
       }
 
       const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
       loadFiles(fullPath);
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : `Failed to delete ${item.type}`
+        err instanceof Error
+          ? err.message
+          : t("failedToDelete", { type: item.type })
       );
     } finally {
       setIsDeletingItem(null);
@@ -332,7 +336,7 @@ export default function Dashboard() {
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
-                placeholder="Search documents..."
+                placeholder={t("searchPlaceholder")}
                 className="h-9"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -374,7 +378,7 @@ export default function Dashboard() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" size="sm">
                     <FolderPlus className="h-4 w-4 mr-2" />
-                    New folder
+                    {t("newFolder")}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
@@ -386,9 +390,11 @@ export default function Dashboard() {
                   >
                     <div className="grid gap-4">
                       <div className="space-y-2">
-                        <h4 className="font-medium leading-none">New folder</h4>
+                        <h4 className="font-medium leading-none">
+                          {t("newFolderTitle")}
+                        </h4>
                         <p className="text-sm text-muted-foreground">
-                          Enter a name for the new folder
+                          {t("newFolderDescription")}
                         </p>
                       </div>
                       <div className="grid gap-2">
@@ -402,7 +408,7 @@ export default function Dashboard() {
                           <Input
                             id="folderName"
                             value={newFolderName}
-                            placeholder="Folder name"
+                            placeholder={t("folderNamePlaceholder")}
                             className="col-span-4"
                             onChange={(e) => setNewFolderName(e.target.value)}
                             autoFocus
@@ -417,9 +423,9 @@ export default function Dashboard() {
                               setIsPopoverOpen(false);
                             }}
                           >
-                            Cancel
+                            {t("cancel")}
                           </Button>
-                          <Button type="submit">Create</Button>
+                          <Button type="submit">{t("create")}</Button>
                         </div>
                       </div>
                     </div>
@@ -436,7 +442,7 @@ export default function Dashboard() {
                 onClick={() => setCurrentPath("")}
                 className="cursor-pointer hover:underline text-muted-foreground hover:text-foreground"
               >
-                My Documents
+                {t("myDocuments")}
               </span>
               {currentPath
                 .split("/")
@@ -469,14 +475,16 @@ export default function Dashboard() {
 
           {/* Files and folders section */}
           <section>
-            <h2 className="text-lg font-semibold mb-4">Files and Folders</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              {t("filesAndFolders")}
+            </h2>
 
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
             ) : filteredItems.length === 0 ? (
-              <div className="p-4 text-center">No files or folders found</div>
+              <div className="p-4 text-center">{t("noFilesFound")}</div>
             ) : (
               <div
                 className={
