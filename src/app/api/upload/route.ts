@@ -1,44 +1,63 @@
-import { put } from "@vercel/blob"
-import { NextResponse } from "next/server"
+// app/api/uploads/route.ts
+import { NextResponse } from "next/server";
+import { StorageService } from "@/services/storage.service";
 
+// Instancia del servicio de almacenamiento
+const storageService = new StorageService();
+
+// POST /api/uploads
 export async function POST(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const filename = searchParams.get("filename")
-
-  if (!filename) {
-    return NextResponse.json({ error: "Filename is required" }, { status: 400 })
-  }
-
   try {
-    const formData = await request.formData()
-    const file = formData.get("file") as File
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+    console.log("File received:", file);
 
-    if (!file) {
-      return NextResponse.json({ error: "File is required" }, { status: 400 })
+    if (!file || !("arrayBuffer" in file)) {
+      return NextResponse.json(
+        { error: "No valid file provided" },
+        { status: 400, headers: corsHeaders }
+      );
     }
 
-    // Check file type - reject video and audio files
-    if (file.type.startsWith("video/") || file.type.startsWith("audio/")) {
-      return NextResponse.json({ error: "Video and audio files are not supported" }, { status: 400 })
-    }
+    // Convertimos a Buffer para pasarlo al servicio
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Upload to Vercel Blob
-    const blob = await put(filename, file, {
-      access: "public",
-    })
+    const uploadedFile = {
+      buffer,
+      originalname: "name" in file ? file.name : "unknown",
+      mimetype: "type" in file ? file.type : "application/octet-stream",
+    };
 
-    // Here you would typically:
-    // 1. Process the document with AI to extract content
-    // 2. Store metadata in your database
-    // 3. Return the processed information
+    const result = await storageService.uploadFile({
+      file: uploadedFile,
+      isPublic: true,
+    });
 
-    return NextResponse.json({
-      url: blob.url,
-      success: true,
-      message: "File uploaded successfully",
-    })
-  } catch (error) {
-    console.error("Error uploading file:", error)
-    return NextResponse.json({ error: "Error uploading file" }, { status: 500 })
+    return NextResponse.json(result, {
+      status: 200,
+      headers: corsHeaders,
+    });
+  } catch (error: unknown) {
+    console.error("Error uploading file:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Upload failed" },
+      { status: 500, headers: corsHeaders }
+    );
   }
 }
+
+// Handler para preflight (OPTIONS)
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
+// Encabezados CORS reutilizables
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};

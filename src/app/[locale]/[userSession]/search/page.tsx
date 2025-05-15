@@ -1,20 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileCard } from "@/components/file-card"
-import { Search, Filter } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileCard } from "@/components/file-card";
+import { Search, Filter } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 export default function SearchPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   // Mock search results
   const searchResults = [
@@ -24,7 +37,8 @@ export default function SearchPage() {
       size: "2.4 MB",
       updatedAt: "Hace 2 días",
       relevance: "Alto",
-      matchContext: "...los resultados del <mark>trimestre</mark> muestran un incremento del 15% en...",
+      matchContext:
+        "...los resultados del <mark>trimestre</mark> muestran un incremento del 15% en...",
     },
     {
       name: "Presentación cliente.pptx",
@@ -32,7 +46,8 @@ export default function SearchPage() {
       size: "4.1 MB",
       updatedAt: "Hace 1 semana",
       relevance: "Medio",
-      matchContext: "...propuesta para el <mark>cliente</mark> incluye análisis de...",
+      matchContext:
+        "...propuesta para el <mark>cliente</mark> incluye análisis de...",
     },
     {
       name: "Contrato servicio.docx",
@@ -40,7 +55,8 @@ export default function SearchPage() {
       size: "1.2 MB",
       updatedAt: "Hace 3 días",
       relevance: "Alto",
-      matchContext: "...términos del <mark>contrato</mark> especifican que el servicio...",
+      matchContext:
+        "...términos del <mark>contrato</mark> especifican que el servicio...",
     },
     {
       name: "Análisis mercado.pdf",
@@ -48,7 +64,8 @@ export default function SearchPage() {
       size: "3.7 MB",
       updatedAt: "Hace 5 días",
       relevance: "Medio",
-      matchContext: "...el <mark>análisis</mark> de tendencias indica que el sector...",
+      matchContext:
+        "...el <mark>análisis</mark> de tendencias indica que el sector...",
     },
     {
       name: "Presupuesto 2023.xlsx",
@@ -56,9 +73,10 @@ export default function SearchPage() {
       size: "1.8 MB",
       updatedAt: "Hace 1 mes",
       relevance: "Bajo",
-      matchContext: "...el <mark>presupuesto</mark> asignado para marketing es de...",
+      matchContext:
+        "...el <mark>presupuesto</mark> asignado para marketing es de...",
     },
-  ]
+  ];
 
   return (
     <div className="container mx-auto py-6 px-4">
@@ -76,13 +94,22 @@ export default function SearchPage() {
               <SheetContent>
                 <SheetHeader>
                   <SheetTitle>Filtros de búsqueda</SheetTitle>
-                  <SheetDescription>Refina tus resultados con estos filtros</SheetDescription>
+                  <SheetDescription>
+                    Refina tus resultados con estos filtros
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="py-4 space-y-6">
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium">Tipo de archivo</h3>
                     <div className="space-y-2">
-                      {["PDF", "Word", "Excel", "PowerPoint", "Imagen", "Texto"].map((type) => (
+                      {[
+                        "PDF",
+                        "Word",
+                        "Excel",
+                        "PowerPoint",
+                        "Imagen",
+                        "Texto",
+                      ].map((type) => (
                         <div key={type} className="flex items-center space-x-2">
                           <Checkbox id={`type-${type}`} />
                           <Label htmlFor={`type-${type}`}>{type}</Label>
@@ -92,9 +119,17 @@ export default function SearchPage() {
                   </div>
                   <Separator />
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium">Fecha de modificación</h3>
+                    <h3 className="text-sm font-medium">
+                      Fecha de modificación
+                    </h3>
                     <div className="space-y-2">
-                      {["Hoy", "Esta semana", "Este mes", "Este año", "Personalizado"].map((date) => (
+                      {[
+                        "Hoy",
+                        "Esta semana",
+                        "Este mes",
+                        "Este año",
+                        "Personalizado",
+                      ].map((date) => (
                         <div key={date} className="flex items-center space-x-2">
                           <Checkbox id={`date-${date}`} />
                           <Label htmlFor={`date-${date}`}>{date}</Label>
@@ -106,7 +141,13 @@ export default function SearchPage() {
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium">Etiquetas</h3>
                     <div className="space-y-2">
-                      {["Trabajo", "Personal", "Importante", "Finanzas", "Contratos"].map((tag) => (
+                      {[
+                        "Trabajo",
+                        "Personal",
+                        "Importante",
+                        "Finanzas",
+                        "Contratos",
+                      ].map((tag) => (
                         <div key={tag} className="flex items-center space-x-2">
                           <Checkbox id={`tag-${tag}`} />
                           <Label htmlFor={`tag-${tag}`}>{tag}</Label>
@@ -159,13 +200,17 @@ export default function SearchPage() {
           <TabsContent value="all" className="mt-6">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground">
-                Mostrando {searchResults.length} resultados para "{searchQuery || "todos los documentos"}"
+                Mostrando {searchResults.length} resultados para &quot;
+                {searchQuery || "todos los documentos"}&quot;
               </p>
             </div>
 
             <div className="space-y-4">
               {searchResults.map((result, index) => (
-                <div key={index} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
+                <div
+                  key={index}
+                  className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                >
                   <div className="flex items-start gap-4">
                     <FileCard
                       name={result.name}
@@ -181,19 +226,25 @@ export default function SearchPage() {
                             result.relevance === "Alto"
                               ? "bg-green-100 text-green-800"
                               : result.relevance === "Medio"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : result.relevance === "Medio"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : result.relevance === "Medio"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
                           {result.relevance} relevancia
                         </span>
                       </div>
                       <div className="text-sm mb-3">
-                        <p dangerouslySetInnerHTML={{ __html: result.matchContext }} />
+                        <p
+                          dangerouslySetInnerHTML={{
+                            __html: result.matchContext,
+                          }}
+                        />
                       </div>
-                      <div className="text-xs text-muted-foreground">Última modificación: {result.updatedAt}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Última modificación: {result.updatedAt}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -203,9 +254,12 @@ export default function SearchPage() {
           <TabsContent value="content" className="mt-6">
             <div className="flex items-center justify-center p-8 text-center">
               <div>
-                <p className="text-muted-foreground">Busca en el contenido de tus documentos</p>
+                <p className="text-muted-foreground">
+                  Busca en el contenido de tus documentos
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  La búsqueda por contenido utiliza IA para encontrar información dentro de tus documentos
+                  La búsqueda por contenido utiliza IA para encontrar
+                  información dentro de tus documentos
                 </p>
               </div>
             </div>
@@ -213,7 +267,9 @@ export default function SearchPage() {
           <TabsContent value="filename" className="mt-6">
             <div className="flex items-center justify-center p-8 text-center">
               <div>
-                <p className="text-muted-foreground">Busca por nombre de archivo</p>
+                <p className="text-muted-foreground">
+                  Busca por nombre de archivo
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Encuentra documentos por su nombre exacto o parcial
                 </p>
@@ -233,5 +289,5 @@ export default function SearchPage() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
