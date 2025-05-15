@@ -43,13 +43,13 @@ export default async function Home() {
               >
                 <Button
                   variant="ghost"
-                  className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white text-purple-900 hover:bg-white/60"
+                  className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white/80 text-purple-900 hover:bg-white/30 cursor-pointer"
                 >
                   {t("navigation.login")}
                 </Button>
               </SignInButton>
 
-              <SignUpButton
+              {/* <SignUpButton
                 mode="modal"
                 fallbackRedirectUrl="/redirect-after-signin"
               >
@@ -59,7 +59,7 @@ export default async function Home() {
                 >
                   {t("navigation.signup")}
                 </Button>
-              </SignUpButton>
+              </SignUpButton> */}
             </SignedOut>
           </div>
         </div>

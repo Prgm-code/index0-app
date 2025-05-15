@@ -34,7 +34,7 @@ const LanguageSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="text-gray-800 hover:text-gray-900 dark:text-white dark:hover:text-white/80"
+          className="text-gray-800 hover:text-gray-900 dark:text-white dark:hover:text-white/80 hover:bg-purple-950"
         >
           <Globe className="h-4 w-4" />
           <span className="ml-2 hidden md:inline-flex">
@@ -45,7 +45,7 @@ const LanguageSwitcher = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="backdrop-blur-md bg-white/80 dark:bg-black/60 border-gray-200 dark:border-white/20"
+        className="backdrop-blur-md bg-transparent border-gray-200 dark:border-white/20"
       >
         {languages.map((lang) => (
           <DropdownMenuItem
