@@ -1,166 +1,160 @@
 // app/api/chat/route.ts
-import type { NextRequest } from "next/server";
-import { createDataStreamResponse } from "ai";
+
+import { createDataStreamResponse, streamText, generateId } from "ai";
 import type { DataStreamWriter } from "ai";
+import { auth } from "@clerk/nextjs/server";
+// import { openai } from "@ai-sdk/openai";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const textEncoder = new TextEncoder();
-const textDecoder = new TextDecoder();
+const RAG_URL = process.env.RAG_URL || "";
 
-// Buffer to store incomplete chunks
-let buffer = "";
+async function fetchStreamData(query: string) {
+  const { sessionClaims } = await auth();
+  const folder = `${sessionClaims?.sub}/`;
 
-function modifyChunkSomehow(chunk: Uint8Array): string {
-  // 1) Decode the chunk to string
-  const text = textDecoder.decode(chunk, { stream: true });
+  const response = await fetch(RAG_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+      Authorization: `Bearer ${process.env.API_TOKEN}`,
+    },
+    body: JSON.stringify({
+      query,
+      folder,
+    }),
+  });
 
-  // 2) Add to buffer and split into lines
+  if (!response.ok) {
+    throw new Error(`Error in search: ${response.statusText}`);
+  }
+
+  if (!response.body) {
+    throw new Error("No response body");
+  }
+
+  return response.body.getReader();
+}
+
+async function processStreamChunk(
+  chunk: Uint8Array,
+  dataStream: DataStreamWriter
+) {
+  const decoder = new TextDecoder("utf-8", { fatal: false });
+  const text = decoder.decode(chunk, { stream: true });
+  let buffer = "";
   buffer += text;
   const lines = buffer.split("\n");
-  buffer = lines.pop() || ""; // Keep the last incomplete line in the buffer
+  buffer = lines.pop() || "";
 
-  // Process complete lines
-  const outputParts: string[] = [];
+  let currentResponse = "";
 
   for (const line of lines) {
     const trimmedLine = line.trim();
-    if (!trimmedLine) continue;
+    if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
 
-    // Handle SSE data lines
-    if (trimmedLine.startsWith("data: ")) {
-      const data = trimmedLine.slice(6); // Remove "data: " prefix
+    const data = trimmedLine.slice(6);
 
-      // Handle [DONE] message
-      if (data === "[DONE]") {
-        outputParts.push(
-          `d:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`
-        );
-        continue;
+    try {
+      const parsed = JSON.parse(data);
+      if (parsed.response) {
+        currentResponse = decodeAndCleanText(parsed.response);
+        dataStream.writeMessageAnnotation({
+          id: generateId(),
+          chunk: currentResponse,
+          timestamp: new Date().toISOString(),
+        });
+        dataStream.writeData(currentResponse);
       }
-
-      try {
-        // 3) Parse the JSON data
-        const parsed = JSON.parse(data);
-
-        // 4) Only process non-empty responses
-        if (parsed.response && typeof parsed.response === "string") {
-          // 5) Format as Data-Stream Text Part (tipo 0)
-          outputParts.push(`0:${JSON.stringify(parsed.response)}\n`);
-
-          // If we have usage info, add a finish step part
-          if (parsed.usage) {
-            outputParts.push(
-              `e:{"finishReason":"stop","usage":${JSON.stringify(
-                parsed.usage
-              )},"isContinued":true}\n`
-            );
-          }
-        }
-      } catch (e) {
-        // If parsing fails, it might be an incomplete chunk
-        // We'll add it back to the buffer
-        buffer = trimmedLine.slice(6) + "\n" + buffer;
-      }
+    } catch (e) {
+      console.warn("Failed to parse chunk:", e);
     }
   }
 
-  return outputParts.join("");
+  return buffer;
 }
 
-export async function POST(request: NextRequest) {
-  const { query, folder } = await request.json();
+function decodeAndCleanText(text: string): string {
+  try {
+    return text
+      .replace(/&aacute;/g, "á")
+      .replace(/&eacute;/g, "é")
+      .replace(/&iacute;/g, "í")
+      .replace(/&oacute;/g, "ó")
+      .replace(/&uacute;/g, "ú")
+      .replace(/&ntilde;/g, "ñ")
+      .replace(/\\u00f3/g, "ó")
+      .replace(/\\u00e1/g, "á")
+      .replace(/\\u00e9/g, "é")
+      .replace(/\\u00ed/g, "í")
+      .replace(/\\u00fa/g, "ú")
+      .replace(/\\u00f1/g, "ñ")
+      .replace(/\u00f3/g, "ó")
+      .replace(/\u00e1/g, "á")
+      .replace(/\u00e9/g, "é")
+      .replace(/\u00ed/g, "í")
+      .replace(/\u00fa/g, "ú")
+      .replace(/\u00f1/g, "ñ")
+      .replace(/\\n/g, "\n")
+      .replace(/\\r/g, "")
+      .replace(/\\"/g, '"')
+      .replace(/\\\\/g, "\\")
+      .normalize("NFC");
+  } catch (e) {
+    console.error("Error decoding text:", e);
+    return text;
+  }
+}
 
-  // Reset buffer at the start of each request
-  buffer = "";
+export async function POST(req: Request) {
+  const { query } = await req.json();
 
   return createDataStreamResponse({
-    execute: async (dataStream: DataStreamWriter) => {
-      // Initial message
-      dataStream.writeData("🔍 Consultando tu RAG local…\n\n");
+    execute: (dataStream) => {
+      dataStream.writeData("initialized call");
 
-      const response = await fetch(
-        "http://localhost:8787/autorag/searchAi/stream",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            query:
-              "dame un resumen detallado de repaso independencia Repaso Independencia.pdf",
-            folder: "user_2x7Kkwl0iiVIi63Zvr17w1sb8VZ/",
-          }),
-        }
-      );
+      let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+      let currentResponse = "";
 
-      if (!response.ok) {
-        throw new Error(`Error en la búsqueda: ${response.statusText}`);
-      }
+      const processStream = async () => {
+        reader = await fetchStreamData(query);
 
-      if (!response.body) {
-        throw new Error("No se recibió respuesta del servidor");
-      }
-
-      // Create a TransformStream to handle the response
-      const { readable, writable } = new TransformStream({
-        transform(chunk, controller) {
-          const modifiedText = modifyChunkSomehow(chunk);
-          if (modifiedText) {
-            console.log(modifiedText);
-            controller.enqueue(modifiedText);
-          }
-        },
-      });
-
-      // Set up error handling for the pipe operation
-      const pipePromise = response.body.pipeTo(writable).catch((error) => {
-        console.error("Error en el streaming:", error);
-        throw new Error("Error al procesar la respuesta del servidor");
-      });
-
-      // Process the stream and send to client
-      const reader = readable.getReader();
-
-      try {
         while (true) {
           const { done, value } = await reader.read();
-          if (done) break;
 
-          // The value is already in the correct format thanks to modifyChunkSomehow
-          if (value) {
-            dataStream.writeData(value);
+          if (done) {
+            console.log("Stream complete");
+            dataStream.writeMessageAnnotation({
+              id: generateId(),
+              status: "completed",
+              chunk: currentResponse,
+              timestamp: new Date().toISOString(),
+            });
+            dataStream.writeData("call completed");
+            break;
+          }
+
+          const buffer = await processStreamChunk(value, dataStream);
+          if (buffer) {
+            currentResponse += buffer;
           }
         }
+      };
+
+      try {
+        return processStream();
       } catch (error) {
-        console.error("Error al leer el stream:", error);
-        throw new Error("Error al procesar la respuesta");
+        console.error("Error reading stream:", error);
+        throw error;
       } finally {
-        // Process any remaining buffer content
-        if (buffer) {
-          try {
-            const data = JSON.parse(buffer);
-            if (data.response) {
-              dataStream.writeData(`0:${JSON.stringify(data.response)}\n`);
-            }
-          } catch (e) {
-            console.warn("Failed to parse final buffer:", e);
-          }
-        }
-
-        // Send final finish message
-        dataStream.writeData(
-          `d:{"finishReason":"stop","usage":{"promptTokens":0,"completionTokens":0}}\n`
-        );
-
-        // Ensure resources are properly cleaned up
-        reader.releaseLock();
-        await pipePromise.catch(() => {}); // Handle any remaining pipe errors
+        reader?.releaseLock();
       }
     },
-
-    onError: (err: unknown) =>
-      err instanceof Error ? err.message : String(err),
+    onError: (error) => {
+      console.error("Stream error:", error);
+      return error instanceof Error ? error.message : String(error);
+    },
   });
 }
