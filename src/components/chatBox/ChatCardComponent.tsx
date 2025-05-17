@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useLayoutEffect,
+  useRef,
+  useState,
+  KeyboardEvent,
+  FormEvent,
+} from "react";
 import {
   Card,
   CardContent,
@@ -7,75 +13,68 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-import { MessageCircle, Send } from "lucide-react";
+import { MessageCircle, Send, Loader2 } from "lucide-react";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslations } from "next-intl";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { generate } from "@/actions/chat-actions";
 import { readStreamableValue } from "ai/rsc";
-import { Loader2 } from "lucide-react";
 
 export function ChatCardComponent() {
   const t = useTranslations("chat");
-  const viewportRef = useRef<HTMLDivElement>(null);
+
+  // 🟢 refs -------------------------------------------------------------
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // 🟢 state ------------------------------------------------------------
   const [messages, setMessages] = useState<
     Array<{ id: string; role: "user" | "assistant"; content: string }>
   >([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Función para mantener el scroll al final
-  const scrollToBottom = () => {
-    if (viewportRef.current) {
-      const viewport = viewportRef.current;
-      viewport.scrollTop = viewport.scrollHeight;
-    }
-  };
-
-  // Efecto para scroll automático cuando cambian los mensajes
-  useEffect(() => {
-    scrollToBottom();
+  // 🟢 auto-scroll after every DOM commit -------------------------------
+  useLayoutEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  // 🟢 helpers ----------------------------------------------------------
+  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+      handleSubmit(e as unknown as FormEvent<HTMLFormElement>);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
+
+    // 1. add user message
     const userMessage = {
       id: Date.now().toString(),
       role: "user" as const,
       content: input,
     };
-
-    // Agregar mensaje del usuario
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
 
     try {
+      // 2. call LLM
       const { output } = await generate(input);
-      const assistantMessageId = "assistant-" + Date.now();
-      let assistantResponse = "";
 
-      // Crear mensaje inicial del asistente
+      // 3. add empty assistant placeholder
+      const assistantMessageId = "assistant-" + Date.now();
       setMessages((prev) => [
         ...prev,
-        {
-          id: assistantMessageId,
-          role: "assistant",
-          content: "",
-        },
+        { id: assistantMessageId, role: "assistant", content: "" },
       ]);
 
-      // Actualizar el mensaje del asistente con el stream
+      // 4. stream tokens into that placeholder
+      let assistantResponse = "";
       for await (const delta of readStreamableValue(output)) {
         assistantResponse += delta;
         setMessages((prev) =>
@@ -86,9 +85,8 @@ export function ChatCardComponent() {
           )
         );
       }
-    } catch (error) {
-      console.error("Error generating response:", error);
-      // Mostrar mensaje de error al usuario
+    } catch (err) {
+      console.error("Error generating response:", err);
       setMessages((prev) => [
         ...prev,
         {
@@ -99,23 +97,20 @@ export function ChatCardComponent() {
       ]);
     } finally {
       setIsLoading(false);
-      // Asegurar que el scroll esté al final después de completar
-      setTimeout(scrollToBottom, 100);
     }
   };
 
+  // 🟢 render -----------------------------------------------------------
   return (
     <Card className="w-full h-[850px] flex flex-col">
       <CardHeader className="flex-none pb-4">
         <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
+
       <CardContent className="flex-1 flex flex-col space-y-4 min-h-0 overflow-hidden p-6">
         <ScrollArea className="flex-1 w-full pr-4 -mr-4 h-[600px]">
-          <ScrollAreaPrimitive.Viewport
-            ref={viewportRef}
-            className="w-full h-full"
-          >
+          <ScrollAreaPrimitive.Viewport className="w-full h-full">
             <div className="space-y-4 pb-4">
               {messages.length === 0 ? (
                 <div className="text-center text-muted-foreground py-8">
@@ -145,9 +140,13 @@ export function ChatCardComponent() {
                   </div>
                 ))
               )}
+
+              {/* 🔻 sentinel — always last element */}
+              <div ref={messagesEndRef} />
             </div>
           </ScrollAreaPrimitive.Viewport>
         </ScrollArea>
+
         <form onSubmit={handleSubmit} className="flex space-x-2 flex-none pt-2">
           <Input
             value={input}
