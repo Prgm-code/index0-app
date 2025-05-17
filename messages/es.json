@@ -4,9 +4,18 @@
     "signup": "Registrarse",
     "startFree": "Comenzar gratis",
     "seeDemo": "Ver demo interactiva",
+    "goToApp": "Ir a la aplicación",
     "about": "Acerca de",
     "pricing": "Precios",
     "contact": "Contacto"
+  },
+  "chat": {
+    "title": "Asistente Index0",
+    "description": "Pregúntame cualquier cosa sobre tus documentos almacenados",
+    "placeholder": "Escribe tu pregunta...",
+    "send": "Enviar",
+    "emptyState": "No hay mensajes aún. ¡Inicia una conversación!",
+    "processing": "Procesando tu consulta sobre los archivos almacenados..."
   },
   "menu": {
     "main": "Navegación Principal",

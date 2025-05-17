@@ -34,10 +34,21 @@ import {
   User,
   FolderGit2,
   Folder,
+  MessageCircle,
 } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 import { useSession } from "@clerk/nextjs";
+import {
+  Card,
+  CardTitle,
+  CardHeader,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ChatCardComponent } from "@/components/chatBox/ChatCardComponent";
 
 const getSidebarData = (userSession: string, t: any) => {
   return {
@@ -235,8 +246,9 @@ export default function AdminLayout({
               </div>
             </div>
           </header>
-          <div className="flex justify-center p-4 xl:p-8 animate-fade-up">
-            {children}
+          <div className="grid grid-cols-1 md:grid-cols-3 p-4 xl:p-8 animate-fade-up gap-4">
+            <div className="col-span-2">{children}</div>
+            <ChatCardComponent />
           </div>
         </div>
       </SidebarInset>

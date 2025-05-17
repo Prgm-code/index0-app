@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import LandingDrag from "@/components/LandingDrag";
 import LanguageSwitcher from "@/components/language/LanguageSwitcher";
@@ -11,9 +11,12 @@ import {
   SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function Home() {
   const t = await getTranslations();
+  const { sessionClaims } = await auth();
+  const sessionId = sessionClaims?.sid;
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-800 text-white">
@@ -79,23 +82,30 @@ export default async function Home() {
                   {t("hero.subtitle")}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/signup">
-                    <Button
-                      size="lg"
-                      className="w-full sm:w-auto bg-white text-purple-900 hover:bg-white/90 animate-jump animate-delay-600"
+                  <SignedOut>
+                    <SignUpButton
+                      mode="modal"
+                      fallbackRedirectUrl="/redirect-after-signin"
                     >
-                      {t("navigation.startFree")}
-                    </Button>
-                  </Link>
-                  <Link href="#demo">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 animate-jump animate-delay-700"
-                    >
-                      {t("navigation.seeDemo")}
-                    </Button>
-                  </Link>
+                      <Button
+                        size="lg"
+                        className="w-full sm:w-auto bg-white text-purple-900 hover:bg-white/90 animate-jump animate-delay-600"
+                      >
+                        {t("navigation.startFree")}
+                      </Button>
+                    </SignUpButton>
+                  </SignedOut>
+                  <SignedIn>
+                    <Link href={`${sessionId}`}>
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 animate-jump animate-delay-700"
+                      >
+                        {t("navigation.goToApp")}
+                      </Button>
+                    </Link>
+                  </SignedIn>
                 </div>
               </div>
 
@@ -168,22 +178,24 @@ export default async function Home() {
         </section>
 
         {/* CTA Section */}
-        <div className="mt-16 text-center px-6 view-animate-fade-up">
-          <h2 className="text-3xl font-bold mb-6 text-white animate-fade-in">
-            {t("cta.title")}
-          </h2>
-          <p className="text-xl text-white/80 max-w-2xl mx-auto mb-8 animate-fade-in animate-delay-100">
-            {t("cta.description")}
-          </p>
-          <Link href="#demo">
-            <Button
-              size="lg"
-              className="px-8 bg-white text-purple-900 hover:bg-white/90 animate-bounce animate-infinite animate-duration-[2000ms]"
-            >
-              {t("cta.button")}
-            </Button>
-          </Link>
-        </div>
+        <SignedIn>
+          <div className="mt-16 text-center px-6 view-animate-fade-up">
+            <h2 className="text-3xl font-bold mb-6 text-white animate-fade-in">
+              {t("cta.title")}
+            </h2>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto mb-8 animate-fade-in animate-delay-100">
+              {t("cta.description")}
+            </p>
+            <Link href={`${sessionId}`}>
+              <Button
+                size="lg"
+                className="px-8 bg-white text-purple-900 hover:bg-white/90 animate-bounce animate-infinite animate-duration-[2000ms]"
+              >
+                {t("navigation.goToApp")}
+              </Button>
+            </Link>
+          </div>
+        </SignedIn>
       </main>
 
       {/* Footer */}

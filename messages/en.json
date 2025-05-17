@@ -4,9 +4,18 @@
     "signup": "Sign up",
     "startFree": "Start for free",
     "seeDemo": "See interactive demo",
+    "goToApp": "Go to app",
     "about": "About",
     "pricing": "Pricing",
     "contact": "Contact"
+  },
+  "chat": {
+    "title": "Index0 Assistant",
+    "description": "Ask me anything about your stored documents",
+    "placeholder": "Type your question...",
+    "send": "Send",
+    "emptyState": "No messages yet. Start a conversation!",
+    "processing": "Processing your query about the stored files..."
   },
   "menu": {
     "main": "Main Navigation",
