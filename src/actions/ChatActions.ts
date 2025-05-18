@@ -22,7 +22,7 @@ export async function generate(query: string) {
   if (!folders) {
     throw new Error("No folder found");
   }
-  console.log(folders);
+  // console.log(folders);
 
   const decodeText = (text: string): string => {
     try {

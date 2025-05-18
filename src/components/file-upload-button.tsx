@@ -283,7 +283,7 @@ export function FileUploadButton({
                 className="hidden"
                 onChange={handleFileChange}
                 multiple
-                accept=".pdf,.docx,.xlsx,.txt,.png,.jpg,.jpeg"
+                accept="*"
               />
             </div>
           </div>
