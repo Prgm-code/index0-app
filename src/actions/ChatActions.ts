@@ -7,7 +7,7 @@ import { cleanDocumentReference } from "@/utils/document-utils";
 
 const RAG_URL = process.env.RAG_URL || "";
 
-export async function generate(query: string) {
+export async function generate(query: string, locale: string = "es") {
   const stream = createStreamableValue("");
   let buffer = "";
   let currentResponse = "";
@@ -23,6 +23,10 @@ export async function generate(query: string) {
     throw new Error("No folder found");
   }
   // console.log(folders);
+
+  // Modify query based on language
+  const modifiedQuery =
+    locale === "es" ? `<search lang="es">${query}</search>` : query;
 
   const decodeText = (text: string): string => {
     try {
@@ -64,7 +68,7 @@ export async function generate(query: string) {
           Authorization: `Bearer ${process.env.API_TOKEN}`,
         },
         body: JSON.stringify({
-          query,
+          query: modifiedQuery,
           folders,
         }),
       });

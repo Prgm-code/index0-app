@@ -101,7 +101,7 @@
     "uploadingAlert": "📂 Subiendo {count} archivo(s)..."
   },
   "dashboard": {
-    "searchPlaceholder": "Búsqueda indexada de documentos...",
+    "searchPlaceholder": "Búsqueda de documentos indexados...",
     "filterFiles": "Filtrar archivos y carpetas...",
     "newFolder": "Nueva carpeta",
     "newFolderTitle": "Nueva carpeta",

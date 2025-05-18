@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { TailSpin } from "react-loader-spinner";
 import { useTranslations } from "next-intl";
 import { toast } from "@pheralb/toast";
 import { searchFiles } from "@/actions/SearchActions";
 import { VectorSearchResponse } from "@/app/[locale]/[userSession]/page";
+import { useLocale } from "next-intl";
 
 interface SmartSearchProps {
   onSearchResults: (results: VectorSearchResponse) => void;
@@ -19,14 +21,22 @@ export function SmartSearch({
   currentItems,
 }: SmartSearchProps) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = () => {
     if (!searchTerm.trim()) return;
+    setIsLoading(true);
+
+    // Modify query if language is Spanish
+    const modifiedQuery =
+      locale === "es" ? `<search lang="es">${searchTerm}</search>` : searchTerm;
+
     toast.loading({
       text: t("searching"),
       options: {
-        promise: searchFiles(searchTerm),
+        promise: searchFiles(modifiedQuery),
         success: t("searchSuccess"),
         error: t("searchError"),
         autoDismiss: true,
@@ -51,9 +61,11 @@ export function SmartSearch({
           } else {
             onSetItems(currentItems);
           }
+          setIsLoading(false);
         },
         onError(err) {
           onError(err instanceof Error ? err.message : t("searchError"));
+          setIsLoading(false);
         },
       },
     });
@@ -61,28 +73,21 @@ export function SmartSearch({
 
   return (
     <div className="w-full max-w-sm">
-      <label htmlFor="smart-search" className="sr-only">
-        {t("searchPlaceholder")}
-      </label>
       <div className="relative flex items-center">
-        <Search className="absolute left-2 top-2 text-muted-foreground" />
+        <div className="absolute left-3 z-10">
+          {isLoading ? (
+            <TailSpin
+              width={16}
+              height={16}
+              ariaLabel="loading-search"
+              visible={true}
+            />
+          ) : (
+            <Search className="w-4 h-4 text-muted-foreground" />
+          )}
+        </div>
+
         <textarea
-          id="smart-search"
-          rows={2}
-          className="
-            w-full
-            pl-8 pr-14 py-1
-            text-sm
-            leading-snug
-            resize-none
-            rounded-md
-            border
-            border-gray-300 dark:border-gray-600
-            bg-white dark:bg-gray-800
-            placeholder:text-gray-400 dark:placeholder:text-gray-500
-            focus:outline-none focus:ring-2 focus:ring-purple-500
-          "
-          placeholder={t("searchPlaceholder")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={(e) => {
@@ -91,24 +96,21 @@ export function SmartSearch({
               handleSearch();
             }
           }}
+          disabled={isLoading}
+          placeholder={t("searchPlaceholder")}
+          className="w-full min-h-[44px] max-h-[44px] py-2 px-10 text-sm leading-normal resize-none rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
         />
+
         <button
           onClick={handleSearch}
-          className="
-            absolute right-1 top-1/2 -translate-y-1/2
-            px-3 py-1
-            text-xs
-            font-medium
-            rounded
-            bg-purple-600 hover:bg-purple-700
-            text-white
-            focus:outline-none focus:ring-2 focus:ring-purple-500
-          "
+          disabled={isLoading}
+          className="absolute right-2 h-[32px] px-4 text-xs font-medium bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {t("search")}
         </button>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">
+
+      <p className="mt-2 text-xs text-muted-foreground">
         {t("pressEnterOrClick")}
       </p>
     </div>
