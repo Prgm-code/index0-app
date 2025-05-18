@@ -8,15 +8,18 @@ const SEARCH_URL = process.env.SEARCH_URL || "";
 export const searchFiles = async (query: string) => {
   const client = await clerkClient();
   const { sessionClaims } = await auth();
-  const folders = (await client.users.getUser(sessionClaims?.sub as string))
-    .privateMetadata.folder as string[];
+  const user = await client.users.getUser(sessionClaims?.sub as string);
+  const folders = Array.isArray(user.privateMetadata.folder)
+    ? [...user.privateMetadata.folder]
+    : [];
+
   const rootFolder = `${sessionClaims?.sub}/`;
 
   folders.push(rootFolder);
 
   try {
     const response = await fetch(SEARCH_URL, {
-      method: "POST",
+      method: "POST" /*  */,
       body: JSON.stringify({ query, folders }),
       headers: {
         "Content-Type": "application/json",

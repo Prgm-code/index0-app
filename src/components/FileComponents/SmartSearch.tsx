@@ -57,10 +57,10 @@ export function SmartSearch({
               },
             }));
             onSetItems(vectorResults);
-            onSearchResults(typed);
           } else {
             onSetItems(currentItems);
           }
+          onSearchResults(typed);
           setIsLoading(false);
         },
         onError(err) {

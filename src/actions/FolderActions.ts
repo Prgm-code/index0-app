@@ -36,6 +36,9 @@ export async function createFolder(data: { path: string; clerkId: string }) {
     const client = await clerkClient();
 
     const user = await client.users.getUser(clerkId);
+    const currentFolders = Array.isArray(user.privateMetadata.folder)
+      ? [...user.privateMetadata.folder]
+      : [];
 
     // Normalizar el path: eliminar múltiples slashes y espacios
     let normalizedPath = path
@@ -76,7 +79,7 @@ export async function createFolder(data: { path: string; clerkId: string }) {
 
     await client.users.updateUserMetadata(clerkId, {
       privateMetadata: {
-        folder: [...(user.privateMetadata.folder as string[]), fullPath],
+        folder: [...currentFolders, fullPath],
       },
     });
 
@@ -167,8 +170,10 @@ export async function deleteFolder(data: { prefix: string; clerkId: string }) {
 
     // Update user metadata to remove the folder
     const client = await clerkClient();
-    const user = await client.users.getUser(clerkId);
-    const currentFolders = (user.privateMetadata.folder as string[]) || [];
+    const user = await client.users.getUser(sessionClaims?.sub as string);
+    const currentFolders = Array.isArray(user.privateMetadata.folder)
+      ? [...user.privateMetadata.folder]
+      : [];
 
     await client.users.updateUserMetadata(clerkId, {
       privateMetadata: {

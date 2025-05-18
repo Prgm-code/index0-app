@@ -13,8 +13,10 @@ export async function generate(query: string, locale: string = "es") {
   let currentResponse = "";
   const client = await clerkClient();
   const { sessionClaims } = await auth();
-  const folders = (await client.users.getUser(sessionClaims?.sub as string))
-    .privateMetadata.folder as string[];
+  const user = await client.users.getUser(sessionClaims?.sub as string);
+  const folders = Array.isArray(user.privateMetadata.folder)
+    ? [...user.privateMetadata.folder]
+    : [];
   const rootFolder = `${sessionClaims?.sub}/`;
 
   folders.push(rootFolder);
