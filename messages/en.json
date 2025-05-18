@@ -101,7 +101,8 @@
     "uploadingAlert": "📂 Uploading {count} file(s)..."
   },
   "dashboard": {
-    "searchPlaceholder": "Search documents...",
+    "searchPlaceholder": "Indexed documents search...",
+    "filterFiles": "Filter files and folders...",
     "newFolder": "New folder",
     "newFolderTitle": "New folder",
     "newFolderDescription": "Enter a name for the new folder",
@@ -121,6 +122,12 @@
     "creatingFolder": "Creating folder...",
     "folderCreated": "Folder created successfully!",
     "deletingItem": "Deleting item...",
-    "itemDeleted": "Item deleted successfully"
+    "itemDeleted": "Item deleted successfully",
+    "searching": "Searching...",
+    "searchSuccess": "Search completed successfully",
+    "searchError": "Failed to search files",
+    "searchResults": "Search Results",
+    "pressEnterOrClick": "Press Enter to search or click the button",
+    "search": "Search"
   }
 }

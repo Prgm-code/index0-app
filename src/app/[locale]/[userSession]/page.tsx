@@ -36,20 +36,70 @@ import {
 import { useTranslations } from "next-intl";
 import { createFolder, deleteFolder } from "@/actions/FolderActions";
 import { deleteFile } from "@/actions/FileActions";
+import { searchFiles } from "@/actions/SearchActions";
 import { toast } from "@pheralb/toast";
+import { SmartSearch } from "@/components/FileComponents/SmartSearch";
+import { FileList } from "@/components/FileComponents/FileList";
+import { SearchResponse } from "@/components/FileComponents/SearchResponse";
 
 // Define interfaces needed for file management
+export interface VectorSearchResponse {
+  object: string;
+  search_query: string;
+  response: string;
+  data: Array<{
+    file_id: string;
+    filename: string;
+    score: number;
+    content: Array<{
+      id: string;
+      type: string;
+      text: string;
+    }>;
+    attributes: {
+      timestamp: number;
+      folder: string;
+    };
+  }>;
+  has_more: boolean;
+  next_page: string | null;
+}
+
 export interface FileItem {
   key: string;
   size: number;
   lastModified: string;
   type: "file";
   url?: string;
+  vectorMetadata?: {
+    score?: number;
+    content?: Array<{
+      id: string;
+      type: string;
+      text: string;
+    }>;
+    attributes?: {
+      timestamp?: number;
+      folder?: string;
+    };
+  };
 }
 
 export interface FolderItem {
   key: string;
   type: "folder";
+  vectorMetadata?: {
+    score?: number;
+    content?: Array<{
+      id: string;
+      type: string;
+      text: string;
+    }>;
+    attributes?: {
+      timestamp?: number;
+      folder?: string;
+    };
+  };
 }
 
 type Item = FileItem | FolderItem;
@@ -68,71 +118,74 @@ export default function Dashboard() {
   const [newFolderName, setNewFolderName] = useState("");
   const [isDeletingItem, setIsDeletingItem] = useState<string | null>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [localFilter, setLocalFilter] = useState("");
+  const [typedData, setTypedData] = useState<VectorSearchResponse | null>(null);
 
   // Load files from API
-  const loadFiles = async (prefix: string) => {
-    if (!userId) return;
+  const loadFiles = useCallback(
+    async (prefix: string) => {
+      if (!userId) return;
 
-    try {
-      setIsLoading(true);
-      setError(null);
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // Format the prefix correctly
-      const normalizedPrefix = prefix.replace(/\/+/g, "/");
+        // Format the prefix correctly
+        const normalizedPrefix = prefix.replace(/\/+/g, "/");
 
-      const response = await fetch(
-        `/api/files/list?prefix=${encodeURIComponent(normalizedPrefix)}`
-      );
-      const data = await response.json();
+        const response = await fetch(
+          `/api/files/list?prefix=${encodeURIComponent(normalizedPrefix)}`
+        );
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || t("failedToLoadFiles"));
-      }
+        if (!response.ok) {
+          throw new Error(data.error || t("failedToLoadFiles"));
+        }
 
-      // Filter items for the current directory
-      const filteredItems = [...data.folders, ...data.files]
-        .filter((item: Item) => {
-          // Ensure item belongs to current user
-          if (!item.key.startsWith(`${userId}/`)) {
-            return false;
-          }
+        // Filter items for the current directory
+        const filteredItems = [...data.folders, ...data.files]
+          .filter((item: Item) => {
+            // Ensure item belongs to current user
+            if (!item.key.startsWith(`${userId}/`)) {
+              return false;
+            }
 
-          // Normalize the key
-          const normalizedKey = item.key.replace(/\/+/g, "/");
+            // Normalize the key
+            const normalizedKey = item.key.replace(/\/+/g, "/");
 
-          // For root directory, show only first level items
-          if (normalizedPrefix === `${userId}/`) {
-            const relativePath = normalizedKey.replace(`${userId}/`, "");
-            return (
-              !relativePath.includes("/") ||
-              (item.type === "folder" && relativePath.split("/").length === 2)
+            // For root directory, show only first level items
+            if (normalizedPrefix === `${userId}/`) {
+              const relativePath = normalizedKey.replace(`${userId}/`, "");
+              return (
+                !relativePath.includes("/") ||
+                (item.type === "folder" && relativePath.split("/").length === 2)
+              );
+            }
+
+            // For subdirectories, show only current level items
+            const relativeToCurrentPath = normalizedKey.replace(
+              normalizedPrefix,
+              ""
             );
-          }
-
-          // For subdirectories, show only current level items
-          const relativeToCurrentPath = normalizedKey.replace(
-            normalizedPrefix,
-            ""
-          );
-          return (
-            !relativeToCurrentPath.includes("/") ||
-            (item.type === "folder" &&
-              relativeToCurrentPath.split("/").length === 2)
-          );
-        })
-        .map((item: Item) => ({
-          ...item,
-          key: item.key.replace(/\/+/g, "/"),
-        }));
-
-      setItems(filteredItems);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("failedToLoadFiles"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+            return (
+              !relativeToCurrentPath.includes("/") ||
+              (item.type === "folder" &&
+                relativeToCurrentPath.split("/").length === 2)
+            );
+          })
+          .map((item: Item) => ({
+            ...item,
+            key: item.key.replace(/\/+/g, "/"),
+          }));
+        setItems(filteredItems);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t("failedToLoadFiles"));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [currentPath, userId, t]
+  );
 
   // Load files on component mount and when path changes
   useEffect(() => {
@@ -298,10 +351,10 @@ export default function Dashboard() {
       setIsDeletingItem(item.key);
       setError(null);
 
-      const endpoint =
-        item.type === "folder"
-          ? `/api/folders/delete?prefix=${encodeURIComponent(item.key)}`
-          : `/api/files/delete?key=${encodeURIComponent(item.key)}`;
+      // const endpoint =
+      //   item.type === "folder"
+      //     ? `/api/folders/delete?prefix=${encodeURIComponent(item.key)}`
+      //     : `/api/files/delete?key=${encodeURIComponent(item.key)}`;
 
       toast.loading({
         text: t("deletingItem"),
@@ -353,8 +406,10 @@ export default function Dashboard() {
   // Filter items by search term
   const filteredItems = items.filter((item) => {
     const itemName = item.key.split("/").pop() || "";
-    return itemName.toLowerCase().includes(searchTerm.toLowerCase());
+    return itemName.toLowerCase().includes(localFilter.toLowerCase());
   });
+
+  // console.log(items);
 
   // A custom handler to refresh files after upload from the FileUploadButton
   const handleFileUploaded = () => {
@@ -369,16 +424,12 @@ export default function Dashboard() {
         {/* Top navigation */}
         <header className="border-b bg-background">
           <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-2 w-full max-w-md">
-              <Search className="h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder={t("searchPlaceholder")}
-                className="h-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+            <SmartSearch
+              onSearchResults={setTypedData}
+              onError={setError}
+              onSetItems={setItems}
+              currentItems={items}
+            />
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -510,122 +561,26 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Files and folders section */}
-          <section>
-            <h2 className="text-lg font-semibold mb-4">
-              {t("filesAndFolders")}
-            </h2>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <>
+              <FileList
+                items={filteredItems}
+                viewMode={viewMode}
+                onFileClick={handleFileClick}
+                onFolderClick={handleFolderClick}
+                onDelete={handleDelete}
+                isDeletingItem={isDeletingItem}
+                searchTerm={localFilter}
+                onSearchTermChange={setLocalFilter}
+              />
 
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : filteredItems.length === 0 ? (
-              <div className="p-4 text-center">{t("noFilesFound")}</div>
-            ) : (
-              <div
-                className={
-                  viewMode === "grid"
-                    ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"
-                    : "space-y-2"
-                }
-              >
-                {filteredItems.map((item) => (
-                  <div
-                    key={item.key}
-                    onClick={() =>
-                      item.type === "folder"
-                        ? handleFolderClick(item as FolderItem)
-                        : handleFileClick(item as FileItem)
-                    }
-                    className={`relative cursor-pointer group ${
-                      viewMode === "grid"
-                        ? "flex flex-col items-center p-4 border rounded-lg hover:shadow-md"
-                        : "flex items-center p-4 border rounded-lg hover:shadow-md"
-                    }`}
-                  >
-                    {/* Icon */}
-                    {item.type === "folder" ? (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={
-                          viewMode === "grid" ? "h-12 w-12 mb-2" : "h-6 w-6"
-                        }
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                        />
-                      </svg>
-                    ) : (
-                      <FileIcon
-                        filename={item.key}
-                        className={
-                          viewMode === "grid" ? "h-12 w-12 mb-2" : "h-6 w-6"
-                        }
-                      />
-                    )}
-
-                    {/* Info */}
-                    <div
-                      className={
-                        viewMode === "grid"
-                          ? "text-center w-full"
-                          : "ml-3 flex-1"
-                      }
-                    >
-                      <p
-                        className={`text-sm font-medium truncate ${
-                          viewMode === "grid" ? "text-center" : ""
-                        }`}
-                      >
-                        {(() => {
-                          const fullName =
-                            item.key.split("/").filter(Boolean).pop() || "";
-                          return item.type === "folder"
-                            ? fullName.replace(/\/$/, "")
-                            : fullName;
-                        })()}
-                      </p>
-                      {item.type === "file" && (
-                        <p className="text-xs text-muted-foreground truncate">
-                          {formatFileSize((item as FileItem).size)} •{" "}
-                          {formatDistanceToNow(
-                            new Date((item as FileItem).lastModified),
-                            {
-                              addSuffix: true,
-                            }
-                          )}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Delete button */}
-                    <button
-                      onClick={(e) => handleDelete(item, e)}
-                      className={`p-2 rounded-full absolute top-1 right-1 ${
-                        isDeletingItem === item.key
-                          ? "opacity-50 cursor-not-allowed"
-                          : "opacity-0 group-hover:opacity-100"
-                      }`}
-                      disabled={isDeletingItem === item.key}
-                    >
-                      {isDeletingItem === item.key ? (
-                        <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      )}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
+              {typedData && <SearchResponse data={typedData} />}
+            </>
+          )}
         </main>
       </div>
     </Card>

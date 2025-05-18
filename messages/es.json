@@ -101,7 +101,8 @@
     "uploadingAlert": "📂 Subiendo {count} archivo(s)..."
   },
   "dashboard": {
-    "searchPlaceholder": "Buscar documentos...",
+    "searchPlaceholder": "Búsqueda indexada de documentos...",
+    "filterFiles": "Filtrar archivos y carpetas...",
     "newFolder": "Nueva carpeta",
     "newFolderTitle": "Nueva carpeta",
     "newFolderDescription": "Ingresa un nombre para la nueva carpeta",
@@ -121,6 +122,12 @@
     "creatingFolder": "Creando carpeta...",
     "folderCreated": "¡Carpeta creada exitosamente!",
     "deletingItem": "Eliminando elemento...",
-    "itemDeleted": "Elemento eliminado exitosamente"
+    "itemDeleted": "Elemento eliminado exitosamente",
+    "searching": "Buscando...",
+    "searchSuccess": "Búsqueda completada exitosamente",
+    "searchError": "Error al buscar archivos",
+    "searchResults": "Resultados de búsqueda",
+    "pressEnterOrClick": "Presiona Enter para buscar o haz clic en el botón",
+    "search": "Buscar"
   }
 }
