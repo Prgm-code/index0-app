@@ -209,7 +209,7 @@ export default function Dashboard() {
 
   // Create a new folder
   const handleCreateFolder = async () => {
-    if (!newFolderName.trim()) {
+    if (newFolderName.trim() === "") {
       setError(t("folderNameRequired"));
       return;
     }
@@ -221,9 +221,9 @@ export default function Dashboard() {
       // Build folder path
       let folderPath;
       if (!currentPath) {
-        folderPath = `${newFolderName}/`;
+        folderPath = `${newFolderName.trim()}/`;
       } else {
-        folderPath = `${currentPath}/${newFolderName}/`;
+        folderPath = `${currentPath}/${newFolderName.trim()}/`;
       }
 
       // Remove userId if present
