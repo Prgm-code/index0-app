@@ -34,6 +34,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useTranslations } from "next-intl";
+import { createFolder, deleteFolder } from "@/actions/FolderActions";
+import { deleteFile } from "@/actions/FileActions";
+import { toast } from "@pheralb/toast";
 
 // Define interfaces needed for file management
 export interface FileItem {
@@ -211,6 +214,7 @@ export default function Dashboard() {
       return;
     }
 
+    // console.log(userId);
     try {
       setError(null);
 
@@ -224,28 +228,37 @@ export default function Dashboard() {
 
       // Remove userId if present
       folderPath = folderPath.replace(`${userId}/`, "");
-
-      const response = await fetch("/api/folders/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      // console.log(folderPath);
+      toast.loading({
+        text: t("creatingFolder"),
+        options: {
+          promise: createFolder({
+            path: folderPath,
+            clerkId: userId as string,
+          }),
+          success: t("folderCreated"),
+          error: t("failedToCreateFolder"),
+          autoDismiss: true,
+          onError(error) {
+            setError(
+              error instanceof Error ? error.message : t("failedToCreateFolder")
+            );
+          },
+          onSuccess(data) {
+            if ((data as { success: boolean }).success) {
+              const fullPath = currentPath
+                ? `${userId}/${currentPath}/`
+                : `${userId}/`;
+              loadFiles(fullPath);
+              setNewFolderName("");
+              setIsPopoverOpen(false);
+            } else {
+              setError((data as { message: string }).message);
+              throw new Error(t("failedToCreateFolder", { type: "folder" }));
+            }
+          },
         },
-        body: JSON.stringify({
-          path: folderPath,
-          reportId: userId,
-        }),
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || t("failedToCreateFolder"));
-      }
-
-      setNewFolderName("");
-      setIsPopoverOpen(false);
-      const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
-      loadFiles(fullPath);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("failedToCreateFolder"));
     }
@@ -290,18 +303,42 @@ export default function Dashboard() {
           ? `/api/folders/delete?prefix=${encodeURIComponent(item.key)}`
           : `/api/files/delete?key=${encodeURIComponent(item.key)}`;
 
-      const response = await fetch(endpoint, {
-        method: "DELETE",
+      toast.loading({
+        text: t("deletingItem"),
+        options: {
+          promise:
+            item.type === "folder"
+              ? deleteFolder({
+                  prefix: item.key,
+                  clerkId: userId as string,
+                })
+              : deleteFile({
+                  key: item.key,
+                  clerkId: userId as string,
+                }),
+          success: t("itemDeleted"),
+          error: t("failedToDelete", { type: item.type }),
+          autoDismiss: true,
+          onSuccess(data) {
+            if ((data as { success: boolean }).success) {
+              const fullPath = currentPath
+                ? `${userId}/${currentPath}/`
+                : `${userId}/`;
+              loadFiles(fullPath);
+            } else {
+              setError((data as { message: string }).message);
+              throw new Error(t("failedToDelete", { type: item.type }));
+            }
+          },
+          onError(error) {
+            setError(
+              error instanceof Error
+                ? error.message
+                : t("failedToDelete", { type: item.type })
+            );
+          },
+        },
       });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || t("failedToDelete", { type: item.type }));
-      }
-
-      const fullPath = currentPath ? `${userId}/${currentPath}/` : `${userId}/`;
-      loadFiles(fullPath);
     } catch (err) {
       setError(
         err instanceof Error

@@ -117,6 +117,10 @@
     "failedToCreateFolder": "Error al crear carpeta",
     "failedToDelete": "Error al eliminar {type}",
     "failedToGenerateUrl": "Error al generar URL",
-    "home": "Inicio"
+    "home": "Inicio",
+    "creatingFolder": "Creando carpeta...",
+    "folderCreated": "¡Carpeta creada exitosamente!",
+    "deletingItem": "Eliminando elemento...",
+    "itemDeleted": "Elemento eliminado exitosamente"
   }
 }

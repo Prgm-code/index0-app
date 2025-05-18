@@ -18,7 +18,7 @@ import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslations } from "next-intl";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
-import { generate } from "@/actions/chat-actions";
+import { generate } from "@/actions/ChatActions";
 import { readStreamableValue } from "ai/rsc";
 
 export function ChatCardComponent() {

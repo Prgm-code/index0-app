@@ -2,7 +2,7 @@
 
 import { createStreamableValue } from "ai/rsc";
 import { generateId } from "ai";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { cleanDocumentReference } from "@/utils/document-utils";
 
 const RAG_URL = process.env.RAG_URL || "";
@@ -11,13 +11,18 @@ export async function generate(query: string) {
   const stream = createStreamableValue("");
   let buffer = "";
   let currentResponse = "";
-
+  const client = await clerkClient();
   const { sessionClaims } = await auth();
-  const folder = `${sessionClaims?.sub}/`;
+  const folders = (await client.users.getUser(sessionClaims?.sub as string))
+    .privateMetadata.folder as string[];
+  const rootFolder = `${sessionClaims?.sub}/`;
 
-  if (!folder) {
+  folders.push(rootFolder);
+
+  if (!folders) {
     throw new Error("No folder found");
   }
+  console.log(folders);
 
   const decodeText = (text: string): string => {
     try {
@@ -60,7 +65,7 @@ export async function generate(query: string) {
         },
         body: JSON.stringify({
           query,
-          folder,
+          folders,
         }),
       });
 

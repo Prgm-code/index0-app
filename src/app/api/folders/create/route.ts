@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { auth } from "@clerk/nextjs/server";
 
 const s3 = new S3Client({
   region: "auto",
@@ -15,11 +16,13 @@ const BUCKET = process.env.S3_BUCKET_NAME || "";
 
 export async function POST(request: Request) {
   try {
-    const { path, reportId } = await request.json();
+    const { path, clerkId } = await request.json();
 
-    if (!path || !reportId) {
+    const { sessionClaims } = await auth();
+
+    if (!path || !clerkId) {
       return NextResponse.json(
-        { error: "Path and reportId are required" },
+        { error: "Path and clerkId are required" },
         { status: 400 }
       );
     }
@@ -31,12 +34,12 @@ export async function POST(request: Request) {
       .join("/");
 
     // Construir el path completo
-    let fullPath = `${reportId}/${normalizedPath}/`;
+    let fullPath = `${clerkId}/${normalizedPath}/`;
 
     // Asegurarse de que no haya duplicación del reportId
     fullPath = fullPath.replace(
-      new RegExp(`^${reportId}/${reportId}/`),
-      `${reportId}/`
+      new RegExp(`^${clerkId}/${clerkId}/`),
+      `${clerkId}/`
     );
 
     // Eliminar cualquier slash múltiple que pueda haberse creado
@@ -66,7 +69,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       path: fullPath,
-      reportId,
+      clerkId,
     });
   } catch (error) {
     console.error("Error creating folder:", error);

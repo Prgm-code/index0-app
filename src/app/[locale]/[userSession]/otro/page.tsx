@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, KeyboardEvent } from "react";
-import { generate } from "@/actions/chat-actions";
+import { generate } from "@/actions/ChatActions";
 import { readStreamableValue } from "ai/rsc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

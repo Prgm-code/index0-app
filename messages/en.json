@@ -117,6 +117,10 @@
     "failedToCreateFolder": "Failed to create folder",
     "failedToDelete": "Failed to delete {type}",
     "failedToGenerateUrl": "Failed to generate URL",
-    "home": "Home"
+    "home": "Home",
+    "creatingFolder": "Creating folder...",
+    "folderCreated": "Folder created successfully!",
+    "deletingItem": "Deleting item...",
+    "itemDeleted": "Item deleted successfully"
   }
 }
