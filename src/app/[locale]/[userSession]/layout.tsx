@@ -50,6 +50,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ChatCardComponent } from "@/components/chatBox/ChatCardComponent";
 
+// TODO: Add the sidebar data from the database
 const getSidebarData = (userSession: string, t: any) => {
   return {
     user: {
@@ -181,6 +182,7 @@ const getSidebarData = (userSession: string, t: any) => {
     ],
   };
 };
+
 export default function AdminLayout({
   children,
 }: {
@@ -204,7 +206,7 @@ export default function AdminLayout({
           }}
         />
         <div className="relative z-10 min-h-screen bg-background/60 backdrop-blur-sm dark:bg-black/50">
-          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b border-white/10 bg-white/10 dark:bg-black/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-black/20 sticky top-0">
+          <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b border-white/10 bg-white/10 dark:bg-black/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-black/20 sticky top-0 z-50">
             <div className="flex items-center gap-2 px-4 w-full">
               <SidebarTrigger className="-ml-1 text-gray-800 hover:text-gray-900 dark:text-white/80 dark:hover:text-white" />
               <Separator
