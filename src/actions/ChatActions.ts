@@ -7,7 +7,17 @@ import { cleanDocumentReference } from "@/utils/document-utils";
 
 const RAG_URL = process.env.RAG_URL || "";
 
-export async function generate(query: string, locale: string = "es") {
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
+
+export async function generate(
+  query: string,
+  locale: string = "es",
+  history: Message[] = []
+) {
   const stream = createStreamableValue("");
   let buffer = "";
   let currentResponse = "";
@@ -29,6 +39,11 @@ export async function generate(query: string, locale: string = "es") {
   // Modify query based on language
   const modifiedQuery =
     locale === "es" ? `<search lang="es">${query}</search>` : query;
+
+  // Format conversation history for context
+  const conversationContext = history
+    .map((msg) => `${msg.role}: ${msg.content}`)
+    .join("\n");
 
   const decodeText = (text: string): string => {
     try {
@@ -72,6 +87,7 @@ export async function generate(query: string, locale: string = "es") {
         body: JSON.stringify({
           query: modifiedQuery,
           folders,
+          conversation_history: conversationContext,
         }),
       });
 

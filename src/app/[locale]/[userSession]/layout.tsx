@@ -196,6 +196,7 @@ export default function AdminLayout({
     <SidebarProvider>
       <AppSidebar data={data} />
       <SidebarInset className="relative">
+        {/* FONDO DECORATIVO */}
         <div
           className="fixed inset-0 z-0"
           style={{
@@ -205,7 +206,7 @@ export default function AdminLayout({
             backgroundPosition: "center",
           }}
         />
-        <div className="relative z-10 min-h-screen bg-background/60 backdrop-blur-sm dark:bg-black/50">
+        <div className="relative z-10 flex flex-col h-[100dvh] min-h-0 bg-background/60 backdrop-blur-sm dark:bg-black/50">
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b border-white/10 bg-white/10 dark:bg-black/30 backdrop-blur-md supports-[backdrop-filter]:bg-white/5 dark:supports-[backdrop-filter]:bg-black/20 sticky top-0 z-50">
             <div className="flex items-center gap-2 px-4 w-full">
               <SidebarTrigger className="-ml-1 text-gray-800 hover:text-gray-900 dark:text-white/80 dark:hover:text-white" />
@@ -248,9 +249,21 @@ export default function AdminLayout({
               </div>
             </div>
           </header>
-          <div className="grid grid-cols-1 md:grid-cols-3 p-4 xl:p-8 animate-fade-up gap-4">
-            <div className="col-span-2">{children}</div>
-            <ChatCardComponent />
+          {/* ---------- CONTENIDO GRID ---------- */}
+          {/* 📌 flex-1 min-h-0 para tomar el resto del alto */}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            {/* 📌 h-full para que el grid llene el área disponible */}
+            <div className="grid grid-cols-1 md:grid-cols-3 h-full p-4 xl:p-8 animate-fade-up gap-4">
+              {/* COLUMNA PRINCIPAL */}
+              {/* overflow-auto para que el scrolling ocurra aquí si hace falta */}
+              <div className="col-span-2 overflow-auto">{children}</div>
+
+              {/* COLUMNA CHAT */}
+              {/* 📌 flex col min-h-0 => el Chat hereda la altura */}
+              <div className="flex flex-col min-h-0">
+                <ChatCardComponent /> {/* ya tiene flex-1 min-h-0 */}
+              </div>
+            </div>
           </div>
         </div>
       </SidebarInset>

@@ -8,9 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from "lucide-react";
+import { useLocale } from "next-intl";
+
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+}
 
 export default function Home() {
-  const [generation, setGeneration] = useState<string>("");
+  const locale = useLocale();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -19,18 +27,52 @@ export default function Home() {
     if (!inputText.trim() || isLoading) return;
 
     setIsLoading(true);
-    setGeneration("");
+
+    // Add user message
+    const userMessage = {
+      id: Date.now().toString(),
+      role: "user" as const,
+      content: inputText,
+    };
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText("");
 
     try {
-      const { output } = await generate(inputText);
+      // Call LLM with current conversation history
+      const conversationHistory = [...messages, userMessage];
+      const { output } = await generate(inputText, locale, conversationHistory);
 
+      // Add empty assistant placeholder
+      const assistantMessageId = "assistant-" + Date.now();
+      const assistantMessage = {
+        id: assistantMessageId,
+        role: "assistant" as const,
+        content: "",
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+
+      // Stream tokens into that placeholder
+      let assistantResponse = "";
       for await (const delta of readStreamableValue(output)) {
-        setGeneration((currentGeneration) => {
-          return currentGeneration + delta;
-        });
+        assistantResponse += delta;
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: assistantResponse }
+              : msg
+          )
+        );
       }
     } catch (error) {
       console.error("Error generating response:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: "error-" + Date.now(),
+          role: "assistant",
+          content: "Lo siento, hubo un error al procesar tu mensaje.",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -81,43 +123,47 @@ export default function Home() {
         <CardContent>
           {/* Chat display area */}
           <div className="min-h-[500px] mb-6 space-y-6 overflow-y-auto max-h-[600px] p-4">
-            {!inputText && !generation && (
+            {messages.length === 0 && (
               <div className="flex items-center justify-center h-full text-muted-foreground">
                 <p>Escribe un mensaje para comenzar la conversación</p>
               </div>
             )}
 
-            {inputText && (
-              <div className="flex items-start gap-3">
-                <Avatar>
-                  <AvatarFallback>Tú</AvatarFallback>
-                </Avatar>
-                <div className="rounded-lg p-4 border w-fit max-w-[80%] bg-muted/50">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex items-start gap-3 ${
+                  message.role === "user" ? "" : "justify-end"
+                }`}
+              >
+                {message.role === "user" && (
+                  <Avatar>
+                    <AvatarFallback>Tú</AvatarFallback>
+                  </Avatar>
+                )}
+                <div
+                  className={`rounded-lg p-4 border w-fit max-w-[80%] ${
+                    message.role === "user" ? "bg-muted/50" : "bg-primary/5"
+                  }`}
+                >
                   <div className="break-words whitespace-pre-wrap">
-                    {formatText(inputText)}
+                    {formatText(message.content)}
                   </div>
                 </div>
+                {message.role === "assistant" && (
+                  <Avatar>
+                    <AvatarFallback>AI</AvatarFallback>
+                  </Avatar>
+                )}
               </div>
-            )}
-
-            {generation && (
-              <div className="flex items-start gap-3 justify-end">
-                <div className="rounded-lg p-4 border w-fit max-w-[80%] bg-primary/5">
-                  <div className="break-words whitespace-pre-wrap">
-                    {formatText(generation)}
-                  </div>
-                </div>
-                <Avatar>
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-              </div>
-            )}
+            ))}
           </div>
 
           {/* Input form */}
           <form onSubmit={handleSubmit} className="flex gap-4">
             <div className="flex-1">
               <Textarea
+                autoFocus
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={handleKeyDown}

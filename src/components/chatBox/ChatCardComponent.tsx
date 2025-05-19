@@ -51,7 +51,14 @@ export function ChatCardComponent() {
 
   // 🟢 auto-scroll after every DOM commit -------------------------------
   useLayoutEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      // Usar scrollIntoView solo en el contenedor de mensajes
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
+      });
+    }
   }, [messages]);
 
   // 🟢 helpers ----------------------------------------------------------
@@ -72,51 +79,118 @@ export function ChatCardComponent() {
   };
 
   const formatDocumentLink = (content: string): React.ReactNode => {
-    // Regex mejorado para detectar documentos con espacios y caracteres especiales
-    const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    // Regex para detectar bloques de código con ```
+    const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+    // Regex para detectar documentos con espacios y caracteres especiales
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+
     const parts: React.ReactNode[] = [];
     let lastIndex = 0;
-    let match = regex.exec(content) as DocumentMatch | null;
+    let contentCopy = content;
 
-    while (match !== null) {
-      // Añadir el texto antes del match, procesando markdown básico
-      if (match.index > lastIndex) {
+    // Buscar todas las ocurrencias de bloques de código y links
+    const matches: Array<{
+      type: "code" | "link";
+      index: number;
+      length: number;
+      content: string;
+      language?: string;
+    }> = [];
+
+    // Encontrar bloques de código
+    let codeMatch;
+    while ((codeMatch = codeBlockRegex.exec(content)) !== null) {
+      matches.push({
+        type: "code",
+        index: codeMatch.index,
+        length: codeMatch[0].length,
+        content: codeMatch[2],
+        language: codeMatch[1],
+      });
+    }
+
+    // Encontrar links
+    let linkMatch;
+    while ((linkMatch = linkRegex.exec(content)) !== null) {
+      matches.push({
+        type: "link",
+        index: linkMatch.index,
+        length: linkMatch[0].length,
+        content: linkMatch[0],
+      });
+    }
+
+    // Ordenar todos los matches por índice
+    matches.sort((a, b) => a.index - b.index);
+
+    // Procesar el contenido con los matches ordenados
+    let currentIndex = 0;
+
+    for (const match of matches) {
+      // Texto antes del match actual
+      if (match.index > currentIndex) {
         const textBefore = content
-          .slice(lastIndex, match.index)
+          .slice(currentIndex, match.index)
           .replace(
             /\+\+([^\+]+)\+\+/g,
             '<span class="text-green-500">$1</span>'
           )
           .replace(/#(\d+)/g, '<span class="text-blue-500">#$1</span>')
           .replace(/\*\*([^\*]+)\*\*/g, '<span class="font-bold">$1</span>');
-        parts.push(<span dangerouslySetInnerHTML={{ __html: textBefore }} />);
+        parts.push(
+          <span
+            key={`text-${currentIndex}`}
+            dangerouslySetInnerHTML={{ __html: textBefore }}
+          />
+        );
       }
 
-      // Añadir el link formateado
-      const fileName = match![1].split("/").pop() || match![1];
-      parts.push(
-        <button
-          key={match!.index}
-          onClick={() => console.log("Clicked document:", match![2])}
-          className="inline-flex items-center gap-1 px-2 py-0.5 my-0.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors text-primary"
-        >
-          <span className="opacity-70">📄</span>
-          <span className="break-all">{fileName}</span>
-        </button>
-      );
+      // Procesar el match según su tipo
+      if (match.type === "code") {
+        parts.push(
+          <pre
+            key={`code-${match.index}`}
+            className="w-full overflow-x-auto my-2 p-3 rounded-md bg-gray-800 dark:bg-gray-900"
+          >
+            <code className="font-mono text-sm text-gray-100">
+              {match.content}
+            </code>
+          </pre>
+        );
+      } else if (match.type === "link") {
+        const linkRegexInstance = /\[([^\]]+)\]\(([^)]+)\)/;
+        const linkParts = linkRegexInstance.exec(match.content);
+        if (linkParts) {
+          const fileName = linkParts[1].split("/").pop() || linkParts[1];
+          parts.push(
+            <button
+              key={`link-${match.index}`}
+              onClick={() => console.log("Clicked document:", linkParts[2])}
+              className="inline-flex items-center gap-1 px-2 py-0.5 my-0.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors text-primary"
+            >
+              <span className="opacity-70">📄</span>
+              <span className="break-all">{fileName}</span>
+            </button>
+          );
+        }
+      }
 
-      lastIndex = match.index + match[0].length;
-      match = regex.exec(content) as DocumentMatch | null;
+      currentIndex = match.index + match.length;
     }
 
-    // Añadir el resto del texto después del último match
-    if (lastIndex < content.length) {
+    // Texto después del último match
+    if (currentIndex < content.length) {
       const remainingText = content
-        .slice(lastIndex)
+        .slice(currentIndex)
         .replace(/\+\+([^\+]+)\+\+/g, '<span class="text-green-500">$1</span>')
         .replace(/#(\d+)/g, '<span class="text-blue-500">#$1</span>')
         .replace(/\*\*([^\*]+)\*\*/g, '<span class="font-bold">$1</span>');
-      parts.push(<span dangerouslySetInnerHTML={{ __html: remainingText }} />);
+      parts.push(
+        <span
+          key="remaining-text"
+          dangerouslySetInnerHTML={{ __html: remainingText }}
+        />
+      );
     }
 
     return <>{parts}</>;
@@ -138,8 +212,9 @@ export function ChatCardComponent() {
     setInput("");
 
     try {
-      // 2. call LLM with current locale
-      const { output } = await generate(input, locale);
+      // 2. call LLM with current locale and conversation history
+      const conversationHistory = [...messages, userMessage];
+      const { output } = await generate(input, locale, conversationHistory);
 
       // 3. add empty assistant placeholder
       const assistantMessageId = "assistant-" + Date.now();
@@ -177,8 +252,8 @@ export function ChatCardComponent() {
 
   // 🟢 render -----------------------------------------------------------
   return (
-    <Card className="w-full h-[850px] flex flex-col">
-      <CardHeader className="flex-none pb-4 flex flex-row items-center justify-between">
+    <Card className="w-full flex flex-col flex-1 min-h-0 max-h-screen">
+      <CardHeader className="flex-none pb-4 flex items-center justify-between">
         <div>
           <CardTitle>{t("title")}</CardTitle>
           <CardDescription>{t("description")}</CardDescription>
@@ -193,10 +268,10 @@ export function ChatCardComponent() {
         </Button>
       </CardHeader>
 
-      <CardContent className="flex-1 flex flex-col min-h-0 overflow-hidden p-6">
-        <ScrollArea className="flex-1 w-full pr-4 -mr-4 h-[600px]">
-          <ScrollAreaPrimitive.Viewport className="w-full h-full">
-            <div className="space-y-4 pb-4">
+      <CardContent className="flex flex-col flex-1 min-h-0 p-6">
+        <ScrollArea className="flex-1 w-full pr-4 -mr-4 overflow-y-auto">
+          <ScrollAreaPrimitive.Viewport className="w-full h-full flex flex-col">
+            <div className="space-y-4 pb-4 flex-1">
               {messages.length === 0 ? (
                 <div className="text-center text-muted-foreground py-8">
                   <MessageCircle className="mx-auto h-12 w-12 mb-2 opacity-50" />
@@ -207,14 +282,16 @@ export function ChatCardComponent() {
                   <div
                     key={message.id}
                     className={`flex ${
-                      message.role === "user" ? "justify-end" : "justify-start"
+                      message.role === "user"
+                        ? "justify-end"
+                        : "justify-start w-full"
                     } mb-4`}
                   >
                     <div
-                      className={`rounded-lg px-4 py-3 max-w-[85%] break-words ${
+                      className={`rounded-lg px-4 py-3 ${
                         message.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-primary text-primary-foreground max-w-[85%] break-words"
+                          : "bg-muted w-full break-words"
                       }`}
                     >
                       <div className="whitespace-pre-wrap break-all">
@@ -231,9 +308,15 @@ export function ChatCardComponent() {
               <div ref={messagesEndRef} />
             </div>
           </ScrollAreaPrimitive.Viewport>
+          <ScrollAreaPrimitive.Scrollbar
+            className="flex select-none touch-none p-0.5 bg-muted/5 transition-colors duration-150 ease-out hover:bg-muted/10 data-[orientation=vertical]:w-2.5 data-[orientation=horizontal]:flex-col data-[orientation=horizontal]:h-2.5"
+            orientation="vertical"
+          >
+            <ScrollAreaPrimitive.Thumb className="flex-1 bg-muted-foreground/30 rounded-full relative" />
+          </ScrollAreaPrimitive.Scrollbar>
         </ScrollArea>
 
-        <div className="flex-none pt-4 mt-2 border-t">
+        <div className="pt-4 mt-2 border-t flex-none">
           <form onSubmit={handleSubmit} className="flex gap-3">
             <div className="flex-grow relative">
               <textarea
