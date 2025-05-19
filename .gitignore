@@ -17,6 +17,10 @@
 /.next/
 /out/
 
+# dev.vars
+.dev.vars
+
+
 # production
 /build
 
