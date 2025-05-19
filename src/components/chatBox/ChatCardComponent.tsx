@@ -4,6 +4,7 @@ import React, {
   useState,
   KeyboardEvent,
   FormEvent,
+  useEffect,
 } from "react";
 import {
   Card,
@@ -42,6 +43,7 @@ export function ChatCardComponent() {
 
   // 🟢 refs -------------------------------------------------------------
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   // 🟢 state ------------------------------------------------------------
   const [messages, setMessages] = useState<Message[]>([]);
@@ -60,6 +62,13 @@ export function ChatCardComponent() {
       });
     }
   }, [messages]);
+
+  // Focus textarea when loading is complete
+  useEffect(() => {
+    if (!isLoading && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isLoading]);
 
   // 🟢 helpers ----------------------------------------------------------
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -320,6 +329,7 @@ export function ChatCardComponent() {
           <form onSubmit={handleSubmit} className="flex gap-3">
             <div className="flex-grow relative">
               <textarea
+                ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -331,6 +341,7 @@ export function ChatCardComponent() {
                 placeholder={t("placeholder")}
                 className="w-full min-h-[60px] max-h-[180px] resize-none p-3 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 disabled={isLoading}
+                autoFocus
               />
             </div>
             <Button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, KeyboardEvent } from "react";
+import { useState, KeyboardEvent, useRef, useEffect } from "react";
 import { generate } from "@/actions/ChatActions";
 import { readStreamableValue } from "ai/rsc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,14 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Keep focus on textarea after loading changes
+  useEffect(() => {
+    if (!isLoading && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isLoading, messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,6 +171,7 @@ export default function Home() {
           <form onSubmit={handleSubmit} className="flex gap-4">
             <div className="flex-1">
               <Textarea
+                ref={textareaRef}
                 autoFocus
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
