@@ -220,7 +220,11 @@ const OfficeViewer = ({
     <div className="rounded-lg overflow-hidden border bg-white h-[70vh] w-full relative">
       <iframe
         src={viewers[viewerIndex]}
-        className="w-full h-full"
+        className="
+        sm:w-full
+        md:w-3/4
+        lg:w-4xl
+        xl:w-5xl h-[80dvh]"
         title={filename}
         onError={handleViewerError}
       />
@@ -359,7 +363,7 @@ export default function FileViewerClient({
     case "excel":
     case "powerpoint":
       return (
-        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-full">
+        <div className="rounded-lg overflow-hidden mx-auto bg-black h-[70vh] ">
           <OfficeViewer
             fileUrl={fileUrl}
             filename={filename}

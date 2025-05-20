@@ -124,7 +124,6 @@ export default clerkMiddleware(async (auth, req) => {
   // 2. Manejo de rutas públicas
   if (isPublicRoute(request)) {
     console.log("is public route");
-    if (isProtectedRoute(req)) await auth.protect();
     if (pathname === "/sign-in" && !searchParams.has("redirect_url")) {
       return NextResponse.next();
     }
@@ -143,6 +142,7 @@ export default clerkMiddleware(async (auth, req) => {
     }
 
     const locale = getPreferredLocale(request);
+    if (isProtectedRoute(req)) await auth.protect();
     return NextResponse.redirect(new URL(`/${locale}/${userSession}`, req.url));
   }
 
