@@ -4,11 +4,13 @@ import { formatDistanceToNow } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { FileIcon } from "./FileIcon";
 import { FileItem, FolderItem } from "@/app/[locale]/[userSession]/page";
+import { Link } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
 
 interface FileListProps {
   items: (FileItem | FolderItem)[];
   viewMode: "grid" | "list";
-  onFileClick: (file: FileItem) => void;
+  basePath?: string;
   onFolderClick: (folder: FolderItem) => void;
   onDelete: (item: FileItem | FolderItem, e: React.MouseEvent) => void;
   isDeletingItem: string | null;
@@ -19,7 +21,7 @@ interface FileListProps {
 export function FileList({
   items,
   viewMode,
-  onFileClick,
+  basePath = "file",
   onFolderClick,
   onDelete,
   isDeletingItem,
@@ -27,6 +29,7 @@ export function FileList({
   onSearchTermChange,
 }: FileListProps) {
   const t = useTranslations("dashboard");
+  const params = useParams() as { locale: string; userSession: string };
 
   // Format file size for display
   const formatFileSize = (bytes: number) => {
@@ -62,22 +65,18 @@ export function FileList({
             : "space-y-2"
         }
       >
-        {items.map((item) => (
-          <div
-            key={item.key}
-            onClick={() =>
-              item.type === "folder"
-                ? onFolderClick(item as FolderItem)
-                : onFileClick(item as FileItem)
-            }
-            className={`relative cursor-pointer group ${
-              viewMode === "grid"
-                ? "flex flex-col items-center p-4 border rounded-lg hover:shadow-md"
-                : "flex items-center p-4 border rounded-lg hover:shadow-md"
-            }`}
-          >
-            {/* Icon */}
-            {item.type === "folder" ? (
+        {items.map((item) =>
+          item.type === "folder" ? (
+            <div
+              key={item.key}
+              onClick={() => onFolderClick(item as FolderItem)}
+              className={`relative cursor-pointer group ${
+                viewMode === "grid"
+                  ? "flex flex-col items-center p-4 border rounded-lg hover:shadow-md"
+                  : "flex items-center p-4 border rounded-lg hover:shadow-md"
+              }`}
+            >
+              {/* Icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className={viewMode === "grid" ? "h-12 w-12 mb-2" : "h-6 w-6"}
@@ -92,34 +91,71 @@ export function FileList({
                   d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
                 />
               </svg>
-            ) : (
+              {/* Info */}
+              <div
+                className={
+                  viewMode === "grid" ? "text-center w-full" : "ml-3 flex-1"
+                }
+              >
+                <p
+                  className={`text-sm font-medium truncate ${
+                    viewMode === "grid" ? "text-center" : ""
+                  }`}
+                >
+                  {(() => {
+                    const fullName =
+                      item.key.split("/").filter(Boolean).pop() || "";
+                    return fullName.replace(/\/$/, "");
+                  })()}
+                </p>
+              </div>
+              {/* Delete button */}
+              <button
+                onClick={(e) => onDelete(item, e)}
+                className={`p-2 rounded-full absolute top-1 right-1 ${
+                  isDeletingItem === item.key
+                    ? "opacity-50 cursor-not-allowed"
+                    : "opacity-0 group-hover:opacity-100"
+                }`}
+                disabled={isDeletingItem === item.key}
+              >
+                {isDeletingItem === item.key ? (
+                  <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                )}
+              </button>
+            </div>
+          ) : (
+            <Link
+              href={`/${
+                params.userSession
+              }/${basePath}?key=${encodeURIComponent(item.key)}`}
+              key={item.key}
+              className={`relative block group ${
+                viewMode === "grid"
+                  ? "flex flex-col items-center p-4 border rounded-lg hover:shadow-md"
+                  : "flex items-center p-4 border rounded-lg hover:shadow-md"
+              }`}
+            >
+              {/* Icon */}
               <FileIcon
                 filename={item.key}
                 className={viewMode === "grid" ? "h-12 w-12 mb-2" : "h-6 w-6"}
               />
-            )}
-            {/* Info */}
-            <div
-              className={
-                viewMode === "grid" ? "text-center w-full" : "ml-3 flex-1"
-              }
-            >
-              <p
-                className={`text-sm font-medium truncate ${
-                  viewMode === "grid" ? "text-center" : ""
-                } ${
-                  item.type === "file" ? "text-blue-500 hover:underline" : ""
-                }`}
+              {/* Info */}
+              <div
+                className={
+                  viewMode === "grid" ? "text-center w-full" : "ml-3 flex-1"
+                }
               >
-                {(() => {
-                  const fullName =
-                    item.key.split("/").filter(Boolean).pop() || "";
-                  return item.type === "folder"
-                    ? fullName.replace(/\/$/, "")
-                    : fullName;
-                })()}
-              </p>
-              {item.type === "file" && (
+                <p
+                  className={`text-sm font-medium truncate ${
+                    viewMode === "grid" ? "text-center" : ""
+                  } text-blue-500 hover:underline`}
+                >
+                  {item.key.split("/").filter(Boolean).pop() || ""}
+                </p>
                 <p className="text-xs text-muted-foreground truncate">
                   {formatFileSize((item as FileItem).size)} •{" "}
                   {formatDistanceToNow(
@@ -138,26 +174,29 @@ export function FileList({
                     </>
                   )}
                 </p>
-              )}
-            </div>
-            {/* Delete button */}
-            <button
-              onClick={(e) => onDelete(item, e)}
-              className={`p-2 rounded-full absolute top-1 right-1 ${
-                isDeletingItem === item.key
-                  ? "opacity-50 cursor-not-allowed"
-                  : "opacity-0 group-hover:opacity-100"
-              }`}
-              disabled={isDeletingItem === item.key}
-            >
-              {isDeletingItem === item.key ? (
-                <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4 text-destructive" />
-              )}
-            </button>
-          </div>
-        ))}
+              </div>
+              {/* Delete button */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  onDelete(item, e);
+                }}
+                className={`p-2 rounded-full absolute top-1 right-1 ${
+                  isDeletingItem === item.key
+                    ? "opacity-50 cursor-not-allowed"
+                    : "opacity-0 group-hover:opacity-100"
+                }`}
+                disabled={isDeletingItem === item.key}
+              >
+                {isDeletingItem === item.key ? (
+                  <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                )}
+              </button>
+            </Link>
+          )
+        )}
       </div>
     </section>
   );

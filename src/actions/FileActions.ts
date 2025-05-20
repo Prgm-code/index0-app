@@ -4,6 +4,7 @@ import {
   ListObjectsV2Command,
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -197,6 +198,55 @@ export async function getFileUrl(data: { key: string }) {
     console.error("Error generating presigned URL:", error);
     return {
       error: error.message || "Failed to generate URL",
+      success: false,
+    };
+  }
+}
+
+export async function getFileMetadata(data: { key: string; clerkId: string }) {
+  try {
+    const sessionClaims = await auth();
+
+    if (sessionClaims?.userId !== data.clerkId) {
+      return { error: "Unauthorized", success: false };
+    }
+
+    if (
+      !process.env.S3_ENDPOINT ||
+      !process.env.S3_ACCESS_KEY_ID ||
+      !process.env.S3_SECRET_ACCESS_KEY ||
+      !BUCKET
+    ) {
+      throw new Error(
+        "Missing required environment variables for R2 configuration"
+      );
+    }
+
+    if (!data.key) {
+      return { error: "Key parameter is required", success: false };
+    }
+
+    const command = new HeadObjectCommand({
+      Bucket: BUCKET,
+      Key: data.key,
+    });
+
+    const head = await s3.send(command);
+
+    return {
+      success: true,
+      metadata: {
+        size: head.ContentLength || 0,
+        lastModified: head.LastModified?.toISOString() ?? null,
+        contentType: head.ContentType || "",
+        etag: head.ETag || "",
+        customMetadata: head.Metadata || {},
+      },
+    };
+  } catch (error: any) {
+    console.error("Error fetching file metadata:", error);
+    return {
+      error: error.message || "Failed to get metadata",
       success: false,
     };
   }

@@ -35,12 +35,13 @@ import {
 } from "@/components/ui/popover";
 import { useTranslations } from "next-intl";
 import { createFolder, deleteFolder } from "@/actions/FolderActions";
-import { deleteFile, getFileUrl, listFiles } from "@/actions/FileActions";
+import { deleteFile, listFiles } from "@/actions/FileActions";
 import { searchFiles } from "@/actions/SearchActions";
 import { toast } from "@pheralb/toast";
 import { SmartSearch } from "@/components/FileComponents/SmartSearch";
 import { FileList } from "@/components/FileComponents/FileList";
 import { SearchResponse } from "@/components/FileComponents/SearchResponse";
+import { useRouter, useParams } from "next/navigation";
 
 // Define interfaces needed for file management
 export interface VectorSearchResponse {
@@ -108,6 +109,8 @@ export default function Dashboard() {
   const t = useTranslations("dashboard");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const { userId } = useAuth();
+  const router = useRouter();
+  const params = useParams() as { locale: string; userSession: string };
 
   // FileBrowser state
   const [currentPath, setCurrentPath] = useState("");
@@ -218,14 +221,6 @@ export default function Dashboard() {
     // Format path correctly
     newPath = newPath.replace(/^\/+|\/+$/g, "");
     setCurrentPath(newPath);
-  };
-
-  // Handle file click
-  const handleFileClick = async (file: FileItem) => {
-    const url = await getFileUrl({ key: file.key });
-    if (url && url.success) {
-      window.open(url.url, "_blank");
-    }
   };
 
   // Format file size for display
@@ -558,7 +553,7 @@ export default function Dashboard() {
               <FileList
                 items={filteredItems}
                 viewMode={viewMode}
-                onFileClick={handleFileClick}
+                basePath="file"
                 onFolderClick={handleFolderClick}
                 onDelete={handleDelete}
                 isDeletingItem={isDeletingItem}
