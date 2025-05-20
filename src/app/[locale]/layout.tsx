@@ -20,11 +20,11 @@ const geistMono = Geist_Mono({
 });
 
 // Base metadata that will be overridden by generateMetadata
-export const metadata: Metadata = {
-  title: "Index0",
-  description:
-    "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
-};
+// export const metadata: Metadata = {
+//   title: "Index0",
+//   description:
+//     "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+// };
 
 // Dynamic metadata generator based on locale
 export async function generateMetadata({
@@ -44,14 +44,14 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       locale: ogLocale,
-      url: "https://index0.app",
+      url: "https://www.index0.app",
       title: "Index0",
       description:
         "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
       siteName: "Index0",
       images: [
         {
-          url: "/images/og-image.jpg",
+          url: "/og_en.png",
           width: 1200,
           height: 630,
           alt: "Index0",
@@ -85,6 +85,16 @@ export default async function RootLayout({
     <ViewTransition default="slow-fade">
       <ClerkProvider localization={locale === "en" ? enUS : esMX}>
         <html lang={locale} suppressHydrationWarning>
+          <head>
+            <meta property="og:image" content="<generated>" />
+            <meta property="og:image:type" content="<generated>" />
+            <meta property="og:image:width" content="<generated>" />
+            <meta property="og:image:height" content="<generated>" />
+            <meta property="twitter:image" content="<generated>" />
+            <meta property="twitter:image:type" content="<generated>" />
+            <meta property="twitter:image:width" content="<generated>" />
+            <meta property="twitter:image:height" content="<generated>" />
+          </head>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
           >
