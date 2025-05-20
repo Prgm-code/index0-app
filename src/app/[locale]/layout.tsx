@@ -52,8 +52,8 @@ export async function generateMetadata({
       siteName: "Index0",
       images: [
         {
-          url: locale === "en" ? "/og_en.png" : "/og_es.png",
-          width: 1200,
+          url: locale === "en" ? "/og_en.png" : "/og_en.png",
+          width: 945,
           height: 630,
           alt: "Index0",
         },
