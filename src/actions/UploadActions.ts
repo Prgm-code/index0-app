@@ -9,7 +9,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { getUserMetadata } from "./clerck-actions";
+import { lookup as lookupMime } from "mime-types";
 
 // Create S3 client
 const s3 = new S3Client({
@@ -43,8 +43,6 @@ export async function initializeUpload(data: {
     const user = await client.users.getUser(sessionClaims.userId);
     const userMetadata = user.privateMetadata;
 
-    // console.log(userMetadata);
-
     // Check storage limits
     const currentUsage = (userMetadata.filesSize as number) || 0;
     const maxStorage =
@@ -68,7 +66,6 @@ export async function initializeUpload(data: {
     }
 
     const { filename, parts } = data;
-
     if (!filename || !parts) {
       throw new Error("Missing required fields: filename and parts");
     }
@@ -76,16 +73,18 @@ export async function initializeUpload(data: {
     // Use filename directly as the key
     const key = filename;
 
-    // Initialize multipart upload
+    // Detect MIME type from filename
+    const mimeType = lookupMime(filename) || "application/octet-stream";
+
+    // Initialize multipart upload with correct ContentType
     const create = new CreateMultipartUploadCommand({
       Bucket: BUCKET,
       Key: key,
-      ContentType: "application/octet-stream",
+      ContentType: mimeType,
       ACL: "public-read",
     });
 
     const { UploadId } = await s3.send(create);
-
     if (!UploadId) {
       throw new Error("Failed to get UploadId from S3");
     }
@@ -140,13 +139,11 @@ export async function completeUpload(data: {
 }) {
   try {
     const sessionClaims = await auth();
-
     if (!sessionClaims?.userId) {
       throw new Error("Unauthorized: User not authenticated");
     }
 
     const { key, uploadId, partsInfo, fileSize } = data;
-
     const complete = new CompleteMultipartUploadCommand({
       Bucket: BUCKET,
       Key: key,
@@ -201,16 +198,14 @@ export async function getPresignedUrl(key: string) {
 
     // Create a URL with the custom domain that includes the presigned token
     const customUrl = new URL(key, CUSTOM_DOMAIN);
-
-    // Add authentication parameters from the presigned URL
     const presignedParams = new URL(presignedUrl).searchParams;
-    presignedParams.forEach((value, key) => {
-      customUrl.searchParams.append(key, value);
+    presignedParams.forEach((value, param) => {
+      customUrl.searchParams.append(param, value);
     });
 
     return {
       url: customUrl.toString(),
-      presignedUrl, // Also send the original URL if needed
+      presignedUrl,
     };
   } catch (error) {
     console.error("Error generating presigned URL:", error);
