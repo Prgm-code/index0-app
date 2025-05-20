@@ -23,11 +23,13 @@
   },
   "menu": {
     "main": "Navegación Principal",
-    "plan": "Empresarial",
     "home": "Inicio",
     "dashboard": "Panel",
     "storageUsage": "Uso de Almacenamiento",
     "storageInfo": "{used} / {limit} MB",
+    "plan": {
+      "free": "Plan Starter"
+    },
     "documents": {
       "title": "Documentos",
       "upload": "Subir Documentos",

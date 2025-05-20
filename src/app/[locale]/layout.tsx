@@ -9,6 +9,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { unstable_ViewTransition as ViewTransition } from "react";
+import TanstackProvider from "@/providers/TanstackProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -98,16 +99,18 @@ export default async function RootLayout({
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
           >
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            <TanstackProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <NextIntlClientProvider>{children}</NextIntlClientProvider>
 
-              <Toaster />
-            </ThemeProvider>
+                <Toaster />
+              </ThemeProvider>
+            </TanstackProvider>
           </body>
         </html>
       </ClerkProvider>

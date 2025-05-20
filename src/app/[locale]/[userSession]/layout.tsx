@@ -22,7 +22,7 @@ import { useTranslations } from "next-intl";
 import { useSession } from "@clerk/nextjs";
 
 import { ChatCardComponent } from "@/components/chatBox/ChatCardComponent";
-import { useState } from "react";
+import { useQueryClerk } from "@/hooks/useQueryClerk";
 
 // TODO: Add the sidebar data from the database
 const getSidebarData = (userSession: string, t: any) => {
@@ -36,7 +36,7 @@ const getSidebarData = (userSession: string, t: any) => {
       {
         name: "Index0",
         logo: "/index0-logo-transparente.webp",
-        plan: t("plan"),
+        plan: t("plan.free"),
       },
     ],
     navMain: [
@@ -147,17 +147,17 @@ const getSidebarData = (userSession: string, t: any) => {
       },
       {
         name: t("folders.work"),
-        url: `/client/${userSession}/folders/work`,
+        url: `/client/${userSession}`,
         icon: Briefcase,
       },
       {
         name: t("folders.personal"),
-        url: `/client/${userSession}/folders/personal`,
+        url: `/client/${userSession}`,
         icon: User,
       },
       {
         name: t("folders.projects"),
-        url: `/client/${userSession}/folders/projects`,
+        url: `/client/${userSession}`,
         icon: FolderGit2,
       },
     ],
@@ -173,6 +173,11 @@ export default function AdminLayout({
   const t = useTranslations("menu");
   const { session } = useSession();
   const data = getSidebarData(session?.id ?? "", t);
+
+  const { data: userMetadata, isLoading } = useQueryClerk();
+
+  // console.log(userMetadata);
+
   return (
     <SidebarProvider>
       <AppSidebar data={data} />

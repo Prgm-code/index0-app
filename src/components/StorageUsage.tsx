@@ -9,7 +9,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getUserMetadata } from "@/actions/clerck-actions";
+import { useQueryClerk } from "@/hooks/useQueryClerk";
 
 interface StorageUsageProps {
   isIconMode: boolean;
@@ -20,30 +20,13 @@ export function StorageUsage({
   isIconMode,
   isFullyExpanded,
 }: StorageUsageProps) {
-  const { user } = useUser();
   const t = useTranslations("menu");
-  const [userMetadata, setUserMetadata] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUserMetadata = async () => {
-      try {
-        setIsLoading(true);
-        const metadata = await getUserMetadata(user?.id ?? "");
-        setUserMetadata(metadata);
-      } catch (error) {
-        console.error("Error fetching user metadata:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserMetadata();
-  }, [user]);
+  const { data: userMetadata, isLoading } = useQueryClerk();
 
   // Cálculo de uso en MB y porcentaje
-  const usedBytes = userMetadata?.filesSize || 0;
-  const limitBytes = userMetadata?.maxStorage || 0;
+  const usedBytes = Number(userMetadata?.filesSize ?? 0);
+  const limitBytes = Number(userMetadata?.maxStorage ?? 0);
   const usedMB = usedBytes / 1024 / 1024;
   const limitMB = limitBytes / 1024 / 1024;
   const percent = limitBytes > 0 ? (usedBytes / limitBytes) * 100 : 0;

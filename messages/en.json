@@ -23,11 +23,12 @@
   },
   "menu": {
     "main": "Main Navigation",
-    "plan": "Enterprise",
-    "home": "Home",
     "dashboard": "Dashboard",
     "storageUsage": "Storage Usage",
     "storageInfo": "{used} / {limit} MB",
+    "plan": {
+      "free": "Free Plan"
+    },
     "documents": {
       "title": "Documents",
       "upload": "Upload Documents",
