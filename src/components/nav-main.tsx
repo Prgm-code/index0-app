@@ -61,10 +61,9 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{t("main")}</SidebarGroupLabel>
-
       <StorageUsage isIconMode={isIconMode} isFullyExpanded={isFullyExpanded} />
 
+      <SidebarGroupLabel>{t("main")}</SidebarGroupLabel>
       <SidebarMenu>
         {Array.isArray(items) &&
           items.map((item) => (
