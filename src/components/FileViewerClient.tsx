@@ -298,7 +298,7 @@ export default function FileViewerClient({
   switch (fileType) {
     case "image":
       return (
-        <div className="flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden h-[70vh]">
+        <div className="flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden h-[70vh] w-[90vw]">
           <Image
             src={fileUrl}
             alt={filename}
@@ -330,7 +330,7 @@ export default function FileViewerClient({
 
     case "audio":
       return (
-        <div className="flex flex-col items-center justify-center space-y-4 bg-muted/10 rounded-lg p-6 h-[70vh]">
+        <div className="flex flex-col items-center justify-center space-y-4 bg-muted/10 rounded-lg p-6 h-[70vh] w-[90vw]">
           <div className="text-center mb-2">
             <span className="text-sm text-muted-foreground">Audio File</span>
           </div>
@@ -343,7 +343,7 @@ export default function FileViewerClient({
 
     case "video":
       return (
-        <div className="rounded-lg overflow-hidden bg-black h-[70vh]">
+        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-[90vw]">
           <video
             controls
             className="w-full h-full object-contain"
@@ -359,11 +359,13 @@ export default function FileViewerClient({
     case "excel":
     case "powerpoint":
       return (
-        <OfficeViewer
-          fileUrl={fileUrl}
-          filename={filename}
-          fileType={fileType}
-        />
+        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-[90vw]">
+          <OfficeViewer
+            fileUrl={fileUrl}
+            filename={filename}
+            fileType={fileType}
+          />
+        </div>
       );
 
     default:
