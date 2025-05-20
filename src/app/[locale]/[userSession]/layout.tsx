@@ -238,7 +238,7 @@ export default function AdminLayout({
               {/* COLUMNA PRINCIPAL */}
               {/* overflow-auto para que el scrolling ocurra aquí si hace falta */}
 
-              <div className="col-span-2 w-full flex flex-col flex-1 min-h-0 max-h-screen">
+              <div className="col-span-2 w-full flex flex-col flex-1 h-[90vh] overflow-auto">
                 {children}
               </div>
 

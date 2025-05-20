@@ -99,6 +99,11 @@ export default async function FilePreviewPage({ searchParams }: props) {
     return <div className="p-6 text-center text-red-600">Unauthorized</div>;
   }
 
+  // Check if key contains userId to prevent unauthorized access
+  if (!key.includes(userId)) {
+    return <div className="p-6 text-center text-red-600">Unauthorized</div>;
+  }
+
   const [urlRes, metaRes] = await Promise.all([
     getFileUrl({ key }),
     getFileMetadata({ key, clerkId: userId }),
