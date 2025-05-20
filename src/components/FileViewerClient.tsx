@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { PDFViewer } from "./PDFViewer";
 
 // Create a fallback component for unsupported file types
 const UnsupportedComponent = () => (
@@ -10,6 +12,48 @@ const UnsupportedComponent = () => (
       This file type is not supported for preview.
       <br />
       <span className="text-xs">Please download to view its contents.</span>
+    </p>
+  </div>
+);
+
+// Error view with download button
+export const ErrorView = ({
+  fileUrl,
+  message,
+}: {
+  fileUrl: string;
+  message: string;
+}) => (
+  <div className="flex flex-col items-center justify-center h-[70vh] bg-muted/10 rounded-lg p-6">
+    <div className="text-red-500 mb-4 text-center">
+      {message || "Error loading preview."}
+    </div>
+    <Link
+      href={fileUrl}
+      target="_blank"
+      download
+      className="px-3 py-2 bg-primary text-white rounded-md hover:bg-primary/90 flex items-center gap-2"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Download File
+    </Link>
+    <p className="text-xs text-muted-foreground mt-4">
+      Note: Preview may be unavailable due to file permissions or security
+      settings.
     </p>
   </div>
 );
@@ -129,6 +173,65 @@ function determineFileType(filename: string, contentType: string): string {
   return "unknown";
 }
 
+// Office Viewer Component with multiple fallbacks
+const OfficeViewer = ({
+  fileUrl,
+  filename,
+  fileType,
+}: {
+  fileUrl: string;
+  filename: string;
+  fileType: string;
+}) => {
+  const [viewerIndex, setViewerIndex] = useState(0);
+  const [viewerError, setViewerError] = useState(false);
+
+  // Array of different viewer options to try
+  const viewers = [
+    // Microsoft Office Online viewer (good for Office formats)
+    `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+      fileUrl
+    )}`,
+    // Google Docs viewer (alternative)
+    `https://docs.google.com/viewer?url=${encodeURIComponent(
+      fileUrl
+    )}&embedded=true`,
+  ];
+
+  // If viewer fails, try the next one
+  const handleViewerError = () => {
+    if (viewerIndex < viewers.length - 1) {
+      setViewerIndex(viewerIndex + 1);
+    } else {
+      setViewerError(true);
+    }
+  };
+
+  if (viewerError) {
+    return (
+      <ErrorView
+        fileUrl={fileUrl}
+        message={`Unable to preview ${fileType.toUpperCase()} file. You can download it instead.`}
+      />
+    );
+  }
+
+  return (
+    <div className="rounded-lg overflow-hidden border bg-white h-[70vh] relative">
+      <iframe
+        src={viewers[viewerIndex]}
+        className="w-full h-full"
+        title={filename}
+        onError={handleViewerError}
+      />
+      {/* Viewer selection info */}
+      <div className="absolute top-2 right-2 bg-white/80 px-2 py-1 rounded text-xs">
+        Using viewer {viewerIndex + 1}/{viewers.length}
+      </div>
+    </div>
+  );
+};
+
 interface FileViewerClientProps {
   fileUrl: string;
   filename: string;
@@ -143,6 +246,7 @@ export default function FileViewerClient({
   const [textContent, setTextContent] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   // Determine file type - prioritize extension over content type
   const fileType = determineFileType(filename, contentType);
@@ -153,7 +257,10 @@ export default function FileViewerClient({
       setIsLoading(true);
       fetch(fileUrl)
         .then((response) => {
-          if (!response.ok) throw new Error("Failed to fetch file");
+          if (!response.ok)
+            throw new Error(
+              `Failed to fetch: ${response.status} ${response.statusText}`
+            );
           return response.text();
         })
         .then((text) => {
@@ -162,6 +269,7 @@ export default function FileViewerClient({
         })
         .catch((error) => {
           console.error("Error fetching text:", error);
+          setErrorMessage(error.message || "Failed to fetch file");
           setError(true);
           setIsLoading(false);
         });
@@ -181,18 +289,12 @@ export default function FileViewerClient({
     );
   }
 
-  // Error state
+  // Error state for text files
   if (error) {
-    return (
-      <div className="flex items-center justify-center h-[70vh] bg-muted/10 rounded-lg">
-        <div className="text-red-500">
-          Error loading preview. Please try downloading the file.
-        </div>
-      </div>
-    );
+    return <ErrorView fileUrl={fileUrl} message={errorMessage} />;
   }
 
-  // Render appropriate viewer based on file type
+  // Direct content viewers (less likely to have CORS issues)
   switch (fileType) {
     case "image":
       return (
@@ -209,11 +311,7 @@ export default function FileViewerClient({
       );
 
     case "pdf":
-      return (
-        <div className="rounded-lg overflow-hidden border bg-white h-[70vh]">
-          <iframe src={fileUrl} className="w-full h-full" title={filename} />
-        </div>
-      );
+      return <PDFViewer fileUrl={fileUrl} filename={filename} />;
 
     case "text":
     case "code":
@@ -226,7 +324,9 @@ export default function FileViewerClient({
           </div>
         );
       }
-      return <UnsupportedComponent />;
+      return (
+        <ErrorView fileUrl={fileUrl} message="Failed to load text content" />
+      );
 
     case "audio":
       return (
@@ -259,16 +359,11 @@ export default function FileViewerClient({
     case "excel":
     case "powerpoint":
       return (
-        <div className="rounded-lg overflow-hidden border bg-white h-[70vh]">
-          {/* Google Docs Viewer for Office files */}
-          <iframe
-            src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-              fileUrl
-            )}&embedded=true`}
-            className="w-full h-full"
-            title={filename}
-          />
-        </div>
+        <OfficeViewer
+          fileUrl={fileUrl}
+          filename={filename}
+          fileType={fileType}
+        />
       );
 
     default:

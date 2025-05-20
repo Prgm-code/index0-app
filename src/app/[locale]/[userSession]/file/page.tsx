@@ -3,7 +3,6 @@ import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { PageProps } from "../../../../../.next/types/app/layout";
 import FileViewerClient from "@/components/FileViewerClient";
 
 // Helper to format bytes

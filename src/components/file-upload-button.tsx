@@ -49,12 +49,7 @@ export function FileUploadButton({
   const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    // Filter out video and audio files
-    const filteredFiles = acceptedFiles.filter(
-      (file) =>
-        !file.type.startsWith("video/") && !file.type.startsWith("audio/")
-    );
-    setFiles((prev) => [...prev, ...filteredFiles]);
+    setFiles((prev) => [...prev, ...acceptedFiles]);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -66,13 +61,8 @@ export function FileUploadButton({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-      // Filter out video and audio files
-      const filteredFiles = newFiles.filter((file) => {
-        return (
-          !file.type.startsWith("video/") && !file.type.startsWith("audio/")
-        );
-      });
-      setFiles((prev) => [...prev, ...filteredFiles]);
+
+      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
