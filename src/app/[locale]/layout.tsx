@@ -19,11 +19,54 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Base metadata that will be overridden by generateMetadata
 export const metadata: Metadata = {
   title: "Index0",
   description:
-    "Index0 is a document management system that allows you to manage your documents in a single place.",
+    "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
 };
+
+// Dynamic metadata generator based on locale
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  // Convert locale to OpenGraph format (e.g., 'es' to 'es_MX', 'en' to 'en_US')
+  const ogLocale = locale === "en" ? "en_US" : "es_MX";
+
+  return {
+    title: "Index0",
+    description:
+      "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+    openGraph: {
+      type: "website",
+      locale: ogLocale,
+      url: "https://index0.app",
+      title: "Index0",
+      description:
+        "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+      siteName: "Index0",
+      images: [
+        {
+          url: "/images/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: "Index0",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Index0",
+      description:
+        "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+      images: ["/images/og-image.jpg"],
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -40,8 +83,8 @@ export default async function RootLayout({
 
   return (
     <ViewTransition default="slow-fade">
-      <ClerkProvider localization={esMX}>
-        <html lang={"es"} suppressHydrationWarning>
+      <ClerkProvider localization={locale === "en" ? enUS : esMX}>
+        <html lang={locale} suppressHydrationWarning>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
           >
