@@ -15,14 +15,16 @@ import {
 } from "../ui/card";
 import { Button } from "../ui/button";
 import { MessageCircle, RefreshCw, Send } from "lucide-react";
-import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
+import { Link } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { generate } from "@/actions/ChatActions";
 import { readStreamableValue } from "ai/rsc";
 import { TailSpin } from "react-loader-spinner";
+import { useSession } from "@clerk/nextjs";
 
 interface Message {
   id: string;
@@ -41,6 +43,8 @@ interface DocumentMatch {
 export function ChatCardComponent() {
   const t = useTranslations("chat");
   const locale = useLocale();
+  const { session } = useSession();
+  const sessionId = session?.id;
 
   // 🟢 refs -------------------------------------------------------------
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -172,15 +176,21 @@ export function ChatCardComponent() {
         const linkParts = linkRegexInstance.exec(match.content);
         if (linkParts) {
           const fileName = linkParts[1].split("/").pop() || linkParts[1];
+          const documentPath = linkParts[2];
+          const fileUrl = `/${sessionId}/file?key=${encodeURIComponent(
+            documentPath
+          )}`;
+
           parts.push(
-            <button
+            <Link
+              shallow
               key={`link-${match.index}`}
-              onClick={() => console.log("Clicked document:", linkParts[2])}
+              href={fileUrl}
               className="inline-flex items-center gap-1 px-2 py-0.5 my-0.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors text-primary"
             >
               <span className="opacity-70">📄</span>
               <span className="break-all">{fileName}</span>
-            </button>
+            </Link>
           );
         }
       }

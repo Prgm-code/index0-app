@@ -6,6 +6,7 @@ import { FileIcon } from "./FileIcon";
 import { FileItem, FolderItem } from "@/app/[locale]/[userSession]/page";
 import { Link } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
+import { Card } from "../ui/card";
 
 interface FileListProps {
   items: (FileItem | FolderItem)[];
@@ -41,7 +42,7 @@ export function FileList({
   };
 
   return (
-    <section>
+    <section className="w-full flex flex-col flex-1 min-h-0 max-h-screen">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">
           {searchTerm ? t("searchResults") : t("filesAndFolders")}

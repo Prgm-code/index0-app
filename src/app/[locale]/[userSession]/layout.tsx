@@ -16,7 +16,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { Briefcase, User, FolderGit2 } from "lucide-react";
+import { Briefcase, User, FolderGit2, Home, Folder } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 import { useSession } from "@clerk/nextjs";
@@ -39,100 +39,107 @@ const getSidebarData = (userSession: string, t: any) => {
         plan: t("plan"),
       },
     ],
-    // navMain: [
-    //   {
-    //     title: t("home"),
-    //     url: `/client/${userSession}/dashboard`,
-    //     icon: Home,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("dashboard"),
-    //     url: `/client/${userSession}/dashboard`,
-    //     icon: LayoutDashboard,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.list"),
-    //     url: `/client/${userSession}/documents/list`,
-    //     icon: File,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.recent"),
-    //     url: `/client/${userSession}/documents/recent`,
-    //     icon: Clock,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.favorites"),
-    //     url: `/client/${userSession}/documents/favorites`,
-    //     icon: Star,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.shared"),
-    //     url: `/client/${userSession}/documents/shared`,
-    //     icon: Share2,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.tags"),
-    //     url: `/client/${userSession}/documents/tags`,
-    //     icon: Tag,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.trash"),
-    //     url: `/client/${userSession}/documents/trash`,
-    //     icon: Trash,
-    //     items: [],
-    //   },
-    //   {
-    //     title: t("documents.title"),
-    //     url: "#",
-    //     icon: File,
-    //     items: [
-    //       {
-    //         title: t("documents.upload"),
-    //         url: `/client/${userSession}/documents/upload`,
-    //       },
-    //       {
-    //         title: t("documents.search"),
-    //         url: `/client/${userSession}/documents/search`,
-    //       },
-    //       {
-    //         title: t("documents.view"),
-    //         url: `/client/${userSession}/documents/view`,
-    //       },
-    //     ],
-    //   },
-    //   {
-    //     title: t("reports.title"),
-    //     url: "#",
-    //     icon: FileSpreadsheet,
-    //     items: [
-    //       {
-    //         title: t("reports.monthly"),
-    //         url: `/client/${userSession}/reports/monthly`,
-    //       },
-    //       {
-    //         title: t("reports.annual"),
-    //         url: `/client/${userSession}/reports/annual`,
-    //       },
-    //       {
-    //         title: t("reports.statistics"),
-    //         url: `/client/${userSession}/reports/statistics`,
-    //       },
-    //     ],
-    //   },
-    //   {
-    //     title: t("settings"),
-    //     url: `/client/${userSession}/settings`,
-    //     icon: Settings,
-    //     items: [],
-    //   },
-    // ],
+    navMain: [
+      {
+        title: t("folders.title"),
+        url: `/${userSession}`,
+        icon: Folder,
+        items: [
+          {
+            title: t("home"),
+            url: `/${userSession}`,
+            icon: Folder,
+            items: [],
+          },
+        ],
+      },
+      //   {
+      //     title: t("dashboard"),
+      //     url: `/client/${userSession}/dashboard`,
+      //     icon: LayoutDashboard,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.list"),
+      //     url: `/client/${userSession}/documents/list`,
+      //     icon: File,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.recent"),
+      //     url: `/client/${userSession}/documents/recent`,
+      //     icon: Clock,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.favorites"),
+      //     url: `/client/${userSession}/documents/favorites`,
+      //     icon: Star,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.shared"),
+      //     url: `/client/${userSession}/documents/shared`,
+      //     icon: Share2,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.tags"),
+      //     url: `/client/${userSession}/documents/tags`,
+      //     icon: Tag,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.trash"),
+      //     url: `/client/${userSession}/documents/trash`,
+      //     icon: Trash,
+      //     items: [],
+      //   },
+      //   {
+      //     title: t("documents.title"),
+      //     url: "#",
+      //     icon: File,
+      //     items: [
+      //       {
+      //         title: t("documents.upload"),
+      //         url: `/client/${userSession}/documents/upload`,
+      //       },
+      //       {
+      //         title: t("documents.search"),
+      //         url: `/client/${userSession}/documents/search`,
+      //       },
+      //       {
+      //         title: t("documents.view"),
+      //         url: `/client/${userSession}/documents/view`,
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     title: t("reports.title"),
+      //     url: "#",
+      //     icon: FileSpreadsheet,
+      //     items: [
+      //       {
+      //         title: t("reports.monthly"),
+      //         url: `/client/${userSession}/reports/monthly`,
+      //       },
+      //       {
+      //         title: t("reports.annual"),
+      //         url: `/client/${userSession}/reports/annual`,
+      //       },
+      //       {
+      //         title: t("reports.statistics"),
+      //         url: `/client/${userSession}/reports/statistics`,
+      //       },
+      //     ],
+      //   },
+      //   {
+      //     title: t("settings"),
+      //     url: `/client/${userSession}/settings`,
+      //     icon: Settings,
+      //     items: [],
+      //   },
+    ],
     projects: [
       {
         name: t("folders.title"),
@@ -230,7 +237,10 @@ export default function AdminLayout({
             <div className="grid grid-cols-1 md:grid-cols-3 h-full p-4 xl:p-8 animate-fade-up gap-4">
               {/* COLUMNA PRINCIPAL */}
               {/* overflow-auto para que el scrolling ocurra aquí si hace falta */}
-              <div className="col-span-2 overflow-auto">{children}</div>
+
+              <div className="col-span-2 w-full flex flex-col flex-1 min-h-0 max-h-screen">
+                {children}
+              </div>
 
               {/* COLUMNA CHAT */}
               {/* 📌 flex col min-h-0 => el Chat hereda la altura */}
