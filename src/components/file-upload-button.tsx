@@ -17,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { initializeUpload, completeUpload } from "@/actions/UploadActions";
+import { toast } from "@pheralb/toast";
 
 interface FileUploadButtonProps {
   onUploadComplete?: () => void;
@@ -65,8 +67,8 @@ export function FileUploadButton({
   const uploadFile = useCallback(
     async (file: File) => {
       if (!userId) {
-        setError("No se pudo cargar el archivo: Usuario no identificado");
-        return;
+        setError("No se pudo cargar el archivo");
+        return null;
       }
 
       const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
@@ -87,25 +89,17 @@ export function FileUploadButton({
         }
 
         console.log("Inicializando carga para:", filePath);
-        const initRes = await fetch("/api/upload/init", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            filename: filePath,
-            parts,
-          }),
+
+        const initData = await initializeUpload({
+          filename: filePath,
+          parts,
+          fileSize: file.size,
         });
-
-        const initData = await initRes.json();
-
-        if (!initRes.ok) {
-          throw new Error(initData.error || "Error al iniciar la carga");
-        }
 
         const { uploadId, key, urls } = initData;
 
         if (!uploadId || !key || !urls || !Array.isArray(urls)) {
-          throw new Error("Respuesta inválida del servidor");
+          throw new Error("Error durante la inicialización");
         }
 
         console.log("Carga inicializada:", {
@@ -137,15 +131,9 @@ export function FileUploadButton({
 
           if (!uploadResponse.ok) {
             if (uploadResponse.status === 0) {
-              throw new Error(
-                "Error CORS: Verifica la configuración CORS en tu bucket R2"
-              );
+              throw new Error("Error de conexión");
             }
-            throw new Error(
-              `Error al subir parte ${index + 1}: ${uploadResponse.status} ${
-                uploadResponse.statusText
-              }`
-            );
+            throw new Error("Error durante la carga");
           }
 
           const etag =
@@ -153,11 +141,7 @@ export function FileUploadButton({
             uploadResponse.headers.get("ETag");
 
           if (!etag) {
-            throw new Error(
-              `No se recibió ETag para parte ${
-                index + 1
-              }. Asegúrate de que 'ETag' esté incluido en ExposeHeaders en tu configuración CORS`
-            );
+            throw new Error("Error en la respuesta del servidor");
           }
 
           totalLoaded += chunk.size;
@@ -180,30 +164,32 @@ export function FileUploadButton({
         console.log("Todas las partes subidas exitosamente:", partsInfo);
 
         console.log("Completando carga multiparte...");
-        const completeRes = await fetch("/api/upload/complete", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            key,
-            uploadId,
-            partsInfo,
-          }),
+
+        const completeData = await completeUpload({
+          key,
+          uploadId,
+          partsInfo,
+          fileSize: file.size,
         });
 
-        const completeData = await completeRes.json();
-
-        if (!completeRes.ok) {
-          throw new Error(completeData.error || "Error al completar la carga");
+        if (!completeData.success) {
+          throw new Error("Error al completar la carga");
         }
 
         console.log("Carga completada exitosamente");
         return completeData.location || "";
       } catch (err) {
         console.error("Error de carga:", err);
+        toast.error({
+          text:
+            err instanceof Error
+              ? err.message
+              : "Error al subir el archivo. Inténtelo de nuevo.",
+        });
         setError(
           err instanceof Error
             ? err.message
-            : "Error al subir. Verifica tu configuración CORS."
+            : "Error al subir el archivo. Inténtelo de nuevo."
         );
         return null;
       }
@@ -214,7 +200,7 @@ export function FileUploadButton({
   const handleUpload = async () => {
     if (files.length === 0) return;
 
-    setUploading(true);
+    setError(null);
 
     try {
       for (const file of files) {
@@ -228,11 +214,10 @@ export function FileUploadButton({
         setUploadingFile(null);
         setUploadProgress(null);
         setIsOpen(false);
-        // Llamar al callback onUploadComplete si se proporciona
         onUploadComplete?.();
       }, 500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al subir archivos");
+      setError("Error al subir archivos");
       setUploading(false);
     }
   };
@@ -245,7 +230,11 @@ export function FileUploadButton({
           Subir archivo
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className="w-full sm:max-w-2xl"
+        onEscapeKeyDown={(e) => uploading && e.preventDefault()}
+        onPointerDownOutside={(e) => uploading && e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>Subir archivos</DialogTitle>
           <DialogDescription>
@@ -258,7 +247,7 @@ export function FileUploadButton({
         </DialogHeader>
 
         {error && (
-          <div className="p-3 bg-red-100 text-red-600 rounded-md text-sm">
+          <div className="p-2 bg-red-50 text-red-500 rounded-md text-xs font-medium">
             {error}
           </div>
         )}
@@ -290,17 +279,19 @@ export function FileUploadButton({
 
           {files.length > 0 && (
             <div className="space-y-2">
-              <Label>Archivos seleccionados</Label>
+              <Label>Archivos selecionados</Label>
               <div className="max-h-40 overflow-y-auto space-y-2">
                 {files.map((file, index) => (
                   <div
                     key={index}
                     className="flex items-center justify-between bg-accent/50 p-2 rounded-md"
                   >
-                    <div className="flex items-center space-x-2 truncate">
+                    <div className="flex items-center space-x-2 overflow-hidden">
                       <FilePlus className="h-4 w-4 flex-shrink-0" />
-                      <span className="text-sm truncate">{file.name}</span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm truncate max-w-[500px]">
+                        {file.name}
+                      </span>
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
                         ({(file.size / 1024 / 1024).toFixed(2)} MB)
                       </span>
                     </div>

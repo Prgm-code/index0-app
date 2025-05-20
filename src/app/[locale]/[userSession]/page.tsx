@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/popover";
 import { useTranslations } from "next-intl";
 import { createFolder, deleteFolder } from "@/actions/FolderActions";
-import { deleteFile, listFiles } from "@/actions/FileActions";
+import { deleteFile, getFileUrl, listFiles } from "@/actions/FileActions";
 import { searchFiles } from "@/actions/SearchActions";
 import { toast } from "@pheralb/toast";
 import { SmartSearch } from "@/components/FileComponents/SmartSearch";
@@ -203,26 +203,6 @@ export default function Dashboard() {
     }
   }, [currentPath, userId]);
 
-  // Get presigned URL for file download
-  const getPresignedUrl = async (key: string) => {
-    try {
-      const response = await fetch(
-        `/api/files/presigned?key=${encodeURIComponent(key)}`
-      );
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || t("failedToGenerateUrl"));
-      }
-
-      return data.url;
-    } catch (err) {
-      console.error("Error getting presigned URL:", err);
-      setError(err instanceof Error ? err.message : t("failedToGenerateUrl"));
-      return null;
-    }
-  };
-
   // Handle folder click
   const handleFolderClick = (folder: FolderItem) => {
     const folderName = folder.key.split("/").filter(Boolean).pop() || "";
@@ -242,9 +222,9 @@ export default function Dashboard() {
 
   // Handle file click
   const handleFileClick = async (file: FileItem) => {
-    const url = await getPresignedUrl(file.key);
-    if (url) {
-      window.open(url, "_blank");
+    const url = await getFileUrl({ key: file.key });
+    if (url && url.success) {
+      window.open(url.url, "_blank");
     }
   };
 

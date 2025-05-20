@@ -46,16 +46,17 @@ export function StorageUsage({
   const limitBytes = userMetadata?.maxStorage || 0;
   const usedMB = usedBytes / 1024 / 1024;
   const limitMB = limitBytes / 1024 / 1024;
-  const percent =
-    limitBytes > 0 ? Math.min((usedBytes / limitBytes) * 100, 100) : 0;
+  const percent = limitBytes > 0 ? (usedBytes / limitBytes) * 100 : 0;
 
   // Determine progress bar color based on usage percentage
   const getProgressColorClass = () => {
-    if (percent > 100) return "bg-red-500";
     if (percent >= 90) return "bg-red-500";
     if (percent >= 80) return "bg-yellow-500";
-    return ""; // default color
+    return "bg-primary"; // default color from theme
   };
+
+  // Value to display in the progress bar (capped at 100 for visual purposes)
+  const progressValue = Math.min(percent, 100);
 
   if (isLoading) {
     return renderLoadingState(isIconMode);
@@ -71,8 +72,9 @@ export function StorageUsage({
         <TooltipTrigger asChild>
           <div className="mx-auto px-2 py-1">
             <Progress
-              value={percent}
-              className={`w-6 h-6 rounded-full ${getProgressColorClass()}`}
+              value={progressValue}
+              className="w-6 h-6 rounded-full"
+              indicatorClassName={getProgressColorClass()}
             />
           </div>
         </TooltipTrigger>
@@ -94,8 +96,9 @@ export function StorageUsage({
     <div className="px-4 py-2 animate-in fade-in duration-200">
       <Label className="mb-1 block">{t("storageUsage")}</Label>
       <Progress
-        value={percent}
-        className={`w-full mb-1 ${getProgressColorClass()}`}
+        value={progressValue}
+        className="w-full mb-1"
+        indicatorClassName={getProgressColorClass()}
       />
       <div className="text-sm text-muted-foreground">
         {t("storageInfo", {
