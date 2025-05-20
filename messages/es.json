@@ -15,7 +15,11 @@
     "placeholder": "Escribe tu pregunta...",
     "send": "Enviar",
     "emptyState": "No hay mensajes aún. ¡Inicia una conversación!",
-    "processing": "Procesando tu consulta sobre los archivos almacenados..."
+    "processing": "Procesando tu consulta sobre los archivos almacenados...",
+    "genericError": "Lo siento, hubo un error al procesar tu mensaje.",
+    "rateLimitError": "Límite de consultas excedido. Máximo 3 solicitudes permitidas cada 3 horas. Por favor, intenta nuevamente más tarde.",
+    "timeoutError": "La solicitud ha excedido el tiempo de espera. Por favor, intenta nuevamente.",
+    "networkError": "Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente."
   },
   "menu": {
     "main": "Navegación Principal",

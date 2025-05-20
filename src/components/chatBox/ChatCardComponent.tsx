@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Button } from "../ui/button";
-import { MessageCircle, Send, Loader2, RefreshCw } from "lucide-react";
+import { MessageCircle, RefreshCw, Send } from "lucide-react";
 import { Input } from "../ui/input";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslations } from "next-intl";
@@ -22,6 +22,7 @@ import { useLocale } from "next-intl";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 import { generate } from "@/actions/ChatActions";
 import { readStreamableValue } from "ai/rsc";
+import { TailSpin } from "react-loader-spinner";
 
 interface Message {
   id: string;
@@ -221,9 +222,50 @@ export function ChatCardComponent() {
     setInput("");
 
     try {
+      // Set a timeout for the request (30 seconds)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                "La solicitud ha excedido el tiempo de espera (30 segundos)"
+              )
+            ),
+          30000
+        );
+      });
+
       // 2. call LLM with current locale and conversation history
       const conversationHistory = [...messages, userMessage];
-      const { output } = await generate(input, locale, conversationHistory);
+
+      // Race between the actual request and the timeout
+      const response = (await Promise.race([
+        generate(input, locale, conversationHistory),
+        timeoutPromise,
+      ])) as any;
+
+      // Check if the response indicates an error
+      if (response.success === false) {
+        // Use the error message directly with a fallback for safety
+        const errorMessage =
+          response.error ||
+          t("chat.genericError", {
+            fallback: "Lo siento, hubo un error al procesar tu mensaje.",
+          });
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: "error-" + Date.now(),
+            role: "assistant",
+            content: errorMessage,
+          },
+        ]);
+        return; // Exit early, don't try to stream the response
+      }
+
+      // Continue with successful response
+      const { output } = response;
 
       // 3. add empty assistant placeholder
       const assistantMessageId = "assistant-" + Date.now();
@@ -244,14 +286,38 @@ export function ChatCardComponent() {
           )
         );
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error generating response:", err);
+
+      // Extract error message - handle specific error cases
+      let errorMessage =
+        err.message ||
+        t("chat.genericError", {
+          fallback: "Lo siento, hubo un error al procesar tu mensaje.",
+        });
+
+      // Check for specific error types for more readable messages
+      if (err.message && err.message.includes("Rate limit exceeded")) {
+        errorMessage = t("chat.rateLimitError", { fallback: err.message });
+      }
+      // Check for timeout error
+      else if (err.message && err.message.includes("tiempo de espera")) {
+        errorMessage = t("chat.timeoutError", { fallback: err.message });
+      }
+      // Check for network error
+      else if (err.message && err.message.includes("network")) {
+        errorMessage = t("chat.networkError", {
+          fallback:
+            "Error de conexión. Por favor, verifica tu conexión a internet e intenta nuevamente.",
+        });
+      }
+
       setMessages((prev) => [
         ...prev,
         {
           id: "error-" + Date.now(),
           role: "assistant",
-          content: "Lo siento, hubo un error al procesar tu mensaje.",
+          content: errorMessage,
         },
       ]);
     } finally {
@@ -326,7 +392,7 @@ export function ChatCardComponent() {
         </ScrollArea>
 
         <div className="pt-4 mt-2 border-t flex-none">
-          <form onSubmit={handleSubmit} className="flex gap-3">
+          <form onSubmit={handleSubmit} className="flex gap-3 items-center">
             <div className="flex-grow relative">
               <textarea
                 ref={textareaRef}
@@ -348,10 +414,10 @@ export function ChatCardComponent() {
               type="submit"
               size="icon"
               disabled={isLoading}
-              className="h-[60px] w-[60px] self-end"
+              className="h-[60px] w-[60px] flex items-center justify-center mb-1"
             >
               {isLoading ? (
-                <Loader2 className="h-5 w-5 animate-spin" />
+                <TailSpin color="#ffffff" height={26} width={26} />
               ) : (
                 <Send className="h-5 w-5" />
               )}

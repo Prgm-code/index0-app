@@ -15,7 +15,11 @@
     "placeholder": "Type your question...",
     "send": "Send",
     "emptyState": "No messages yet. Start a conversation!",
-    "processing": "Processing your query about the stored files..."
+    "processing": "Processing your query about the stored files...",
+    "genericError": "Sorry, there was an error processing your message.",
+    "rateLimitError": "Rate limit exceeded. Maximum 3 requests allowed every 3 hours. Please try again later.",
+    "timeoutError": "The request has timed out. Please try again.",
+    "networkError": "Connection error. Please check your internet connection and try again."
   },
   "menu": {
     "main": "Main Navigation",
