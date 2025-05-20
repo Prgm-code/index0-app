@@ -48,15 +48,33 @@ export async function removeRole(formData: FormData) {
 }
 
 export async function getUsers() {
-  const client = await clerkClient();
-  const users = (await client.users.getUserList()).data;
-  return users;
+  try {
+    const client = await clerkClient();
+    const users = (await client.users.getUserList()).data;
+    return users;
+  } catch (err) {
+    return { message: err };
+  }
 }
 
 export async function getUser(userId: string) {
-  const client = await clerkClient();
-  const user = await client.users.getUser(userId);
-  return user;
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    return user;
+  } catch (err) {
+    return { message: err };
+  }
+}
+
+export async function getUserMetadata(userId: string) {
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    return user.privateMetadata;
+  } catch (err) {
+    return { message: err };
+  }
 }
 
 export async function inviteUser(

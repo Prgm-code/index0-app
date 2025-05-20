@@ -14,6 +14,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -32,11 +33,15 @@ export function AppSidebar({
 }: React.ComponentProps<typeof Sidebar> & { data: any }) {
   const { user } = useUser();
   const t = useTranslations("menu");
+  const { state } = useSidebar();
 
   const userData = {
-    firstName: user?.firstName,
-    lastName: user?.lastName,
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
   };
+
+  // Determinar si está en modo icono según el estado del sidebar
+  const isIconMode = state === "collapsed";
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -44,7 +49,10 @@ export function AppSidebar({
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain
+          items={data.navMain}
+          collapsible={isIconMode ? "icon" : "offcanvas"}
+        />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

@@ -2,6 +2,8 @@
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { auth, clerkClient } from "@clerk/nextjs/server";
 
+const MAX_STORAGE = process.env.MAX_STORAGE || 209715200;
+
 // Función para formatear bytes a unidad legible
 function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 Bytes";
@@ -76,6 +78,7 @@ export async function listFiles(data: { prefix: string; clerkId: string }) {
     await client.users.updateUserMetadata(data.clerkId, {
       privateMetadata: {
         filesSize: totalSizeBytes,
+        maxStorage: MAX_STORAGE,
       },
     });
 

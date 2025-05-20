@@ -22,6 +22,8 @@
     "plan": "Empresarial",
     "home": "Inicio",
     "dashboard": "Panel",
+    "storageUsage": "Uso de Almacenamiento",
+    "storageInfo": "{used} / {limit} MB",
     "documents": {
       "title": "Documentos",
       "upload": "Subir Documentos",

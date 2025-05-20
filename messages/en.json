@@ -22,6 +22,8 @@
     "plan": "Enterprise",
     "home": "Home",
     "dashboard": "Dashboard",
+    "storageUsage": "Storage Usage",
+    "storageInfo": "{used} / {limit} MB",
     "documents": {
       "title": "Documents",
       "upload": "Upload Documents",

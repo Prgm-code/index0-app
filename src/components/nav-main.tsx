@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 import {
   Collapsible,
@@ -18,10 +20,11 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { Link } from "@/i18n/navigation";
+import { StorageUsage } from "@/components/StorageUsage";
 
 export function NavMain({
   items,
+  collapsible,
 }: {
   items: {
     title: string;
@@ -33,12 +36,35 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  collapsible?: "offcanvas" | "icon" | "none";
 }) {
   const t = useTranslations("menu");
+  const [isFullyExpanded, setIsFullyExpanded] = useState<boolean>(
+    collapsible !== "icon"
+  );
+  const isIconMode = collapsible === "icon";
+
+  // Manejar el cambio de estado de la barra lateral con un retardo para la animación
+  useEffect(() => {
+    if (collapsible === "icon") {
+      // Si se colapsa, ocultamos inmediatamente
+      setIsFullyExpanded(false);
+    } else {
+      // Si se expande, esperamos a que termine la animación
+      const timer = setTimeout(() => {
+        setIsFullyExpanded(true);
+      }, 300); // Ajusta este valor según la duración de la animación
+
+      return () => clearTimeout(timer);
+    }
+  }, [collapsible]);
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{t("main")}</SidebarGroupLabel>
+
+      <StorageUsage isIconMode={isIconMode} isFullyExpanded={isFullyExpanded} />
+
       <SidebarMenu>
         {Array.isArray(items) &&
           items.map((item) => (

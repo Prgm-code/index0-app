@@ -16,39 +16,13 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import {
-  BookOpen,
-  File,
-  FileSearch,
-  FileSpreadsheet,
-  FolderSearch,
-  Home,
-  LayoutDashboard,
-  Settings,
-  Clock,
-  Star,
-  Share2,
-  Tag,
-  Trash,
-  Briefcase,
-  User,
-  FolderGit2,
-  Folder,
-  MessageCircle,
-} from "lucide-react";
+import { Briefcase, User, FolderGit2 } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 import { useSession } from "@clerk/nextjs";
-import {
-  Card,
-  CardTitle,
-  CardHeader,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+
 import { ChatCardComponent } from "@/components/chatBox/ChatCardComponent";
+import { useState } from "react";
 
 // TODO: Add the sidebar data from the database
 const getSidebarData = (userSession: string, t: any) => {
