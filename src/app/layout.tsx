@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
+import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@pheralb/toast";
 import { ThemeProvider } from "@/providers/theme-provider";
@@ -51,7 +51,7 @@ export async function generateMetadata({
       siteName: "Index0",
       images: [
         {
-          url: "/og_en.png",
+          url: locale === "en" ? "/og_en.png" : "/og_es.png",
           width: 1200,
           height: 630,
           alt: "Index0",
@@ -63,7 +63,7 @@ export async function generateMetadata({
       title: "Index0",
       description:
         "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
-      images: ["/images/og-image.jpg"],
+      images: [locale === "en" ? "/og_en.png" : "/og_es.png"],
     },
   };
 }
@@ -77,9 +77,6 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params;
   console.log("locale", locale);
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
 
   return (
     <ViewTransition default="slow-fade">
