@@ -77,6 +77,9 @@ export default async function RootLayout({
 }>) {
   const { locale } = await params;
   console.log("locale", locale);
+  if (!hasLocale(routing.locales, locale)) {
+    return {};
+  }
 
   return (
     <ViewTransition default="slow-fade">
@@ -91,8 +94,6 @@ export default async function RootLayout({
             <meta property="twitter:image:type" content="<generated>" />
             <meta property="twitter:image:width" content="<generated>" />
             <meta property="twitter:image:height" content="<generated>" />
-            <meta property="og:image:alt" content="Index0" />
-            <meta property="twitter:image:alt" content="Index0" />
           </head>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
