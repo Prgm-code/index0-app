@@ -33,7 +33,7 @@ export function PDFViewer({ fileUrl, filename }: PDFViewerProps) {
   }
 
   return (
-    <div className="overflow-auto h-[70vh] bg-white rounded-lg border flex flex-col">
+    <div className="w-[90vw] max-w-full flex-grow overflow-auto h-[70vh] bg-white rounded-lg border flex flex-col">
       {isLoading && (
         <div className="flex items-center justify-center h-full">
           <div className="animate-pulse text-muted-foreground">

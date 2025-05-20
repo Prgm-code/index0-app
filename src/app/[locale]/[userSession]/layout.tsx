@@ -195,7 +195,7 @@ export default function AdminLayout({
                 orientation="vertical"
                 className="mr-2 data-[orientation=vertical]:h-4 bg-gray-400/20 dark:bg-white/10"
               />
-              <Breadcrumb>
+              {/* <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block text-gray-800 dark:text-white/80">
                     <BreadcrumbLink
@@ -224,7 +224,7 @@ export default function AdminLayout({
                     </BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
-              </Breadcrumb>
+              </Breadcrumb> */}
               <div className="flex justify-end items-center ml-auto">
                 <LanguageSwitcher />
               </div>
