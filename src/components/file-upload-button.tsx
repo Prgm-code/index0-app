@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { initializeUpload, completeUpload } from "@/actions/UploadActions";
 import { toast } from "@pheralb/toast";
+import { useDropzone } from "react-dropzone";
 
 interface FileUploadButtonProps {
   onUploadComplete?: () => void;
@@ -46,6 +47,21 @@ export function FileUploadButton({
     null
   );
   const [error, setError] = useState<string | null>(null);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    // Filter out video and audio files
+    const filteredFiles = acceptedFiles.filter(
+      (file) =>
+        !file.type.startsWith("video/") && !file.type.startsWith("audio/")
+    );
+    setFiles((prev) => [...prev, ...filteredFiles]);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: true,
+    noClick: false, // Allow clicking to open file dialog
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -256,24 +272,21 @@ export function FileUploadButton({
           <div className="grid gap-2">
             <Label htmlFor="files">Archivos</Label>
             <div
-              className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => document.getElementById("file-upload")?.click()}
+              {...getRootProps()}
+              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-accent/50 transition-colors ${
+                isDragActive ? "border-primary bg-accent" : ""
+              }`}
             >
+              <input {...getInputProps()} />
               <Upload className="h-6 w-6 mx-auto mb-2 text-muted-foreground" />
               <p className="text-sm font-medium">
-                Haz clic para seleccionar o arrastra y suelta
+                {isDragActive
+                  ? "Suelta los archivos aquí"
+                  : "Haz clic para seleccionar o arrastra y suelta"}
               </p>
               <p className="text-xs text-muted-foreground mt-1">
                 Máximo 10MB por archivo
               </p>
-              <Input
-                id="file-upload"
-                type="file"
-                className="hidden"
-                onChange={handleFileChange}
-                multiple
-                accept="*"
-              />
             </div>
           </div>
 
