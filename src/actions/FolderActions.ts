@@ -7,7 +7,6 @@ import {
   ServiceOutputTypes,
 } from "@aws-sdk/client-s3";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
 
 const s3 = new S3Client({
   region: "auto",

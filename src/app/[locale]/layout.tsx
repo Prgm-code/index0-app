@@ -8,7 +8,7 @@ import { esMX, enUS } from "@clerk/localizations";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-
+import { unstable_ViewTransition as ViewTransition } from "react";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -39,23 +39,25 @@ export default async function RootLayout({
   }
 
   return (
-    <ClerkProvider localization={esMX}>
-      <html lang={"es"} suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
-        >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
+    <ViewTransition default="slow-fade">
+      <ClerkProvider localization={esMX}>
+        <html lang={"es"} suppressHydrationWarning>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
           >
-            <NextIntlClientProvider>{children}</NextIntlClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <NextIntlClientProvider>{children}</NextIntlClientProvider>
 
-            <Toaster />
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+              <Toaster />
+            </ThemeProvider>
+          </body>
+        </html>
+      </ClerkProvider>
+    </ViewTransition>
   );
 }

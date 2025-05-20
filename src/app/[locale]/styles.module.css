@@ -1,0 +1,7 @@
+::view-transition-old(.slow-fade) {
+  animation-duration: 50ms;
+}
+
+::view-transition-new(.slow-fade) {
+  animation-duration: 50ms;
+}

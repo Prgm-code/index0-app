@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/popover";
 import { useTranslations } from "next-intl";
 import { createFolder, deleteFolder } from "@/actions/FolderActions";
-import { deleteFile } from "@/actions/FileActions";
+import { deleteFile, listFiles } from "@/actions/FileActions";
 import { searchFiles } from "@/actions/SearchActions";
 import { toast } from "@pheralb/toast";
 import { SmartSearch } from "@/components/FileComponents/SmartSearch";
@@ -133,18 +133,25 @@ export default function Dashboard() {
         // Format the prefix correctly
         const normalizedPrefix = prefix.replace(/\/+/g, "/");
 
-        const response = await fetch(
-          `/api/files/list?prefix=${encodeURIComponent(normalizedPrefix)}`
-        );
-        const data = await response.json();
-
-        if (!response.ok) {
+        const data = await listFiles({
+          prefix: normalizedPrefix,
+          clerkId: userId as string,
+        });
+        // console.log(test);
+        // const response = await fetch(
+        //   `/api/files/list?prefix=${encodeURIComponent(normalizedPrefix)}`
+        // );
+        // const data = await response.json();
+        console.log(data);
+        if (!data.success) {
           throw new Error(data.error || t("failedToLoadFiles"));
         }
 
         // Filter items for the current directory
-        const filteredItems = [...data.folders, ...data.files]
-          .filter((item: Item) => {
+        const folders = (data.folders || []) as FolderItem[];
+        const files = (data.files || []) as FileItem[];
+        const filteredItems = [...folders, ...files]
+          .filter((item) => {
             // Ensure item belongs to current user
             if (!item.key.startsWith(`${userId}/`)) {
               return false;
@@ -173,12 +180,13 @@ export default function Dashboard() {
                 relativeToCurrentPath.split("/").length === 2)
             );
           })
-          .map((item: Item) => ({
+          .map((item) => ({
             ...item,
             key: item.key.replace(/\/+/g, "/"),
           }));
         setItems(filteredItems);
       } catch (err) {
+        console.log(err);
         setError(err instanceof Error ? err.message : t("failedToLoadFiles"));
       } finally {
         setIsLoading(false);
