@@ -7,7 +7,7 @@ import { PDFViewer } from "./PDFViewer";
 
 // Create a fallback component for unsupported file types
 const UnsupportedComponent = () => (
-  <div className="flex items-center justify-center h-full min-h-[200px] bg-muted/30 rounded-lg p-6">
+  <div className="flex items-center justify-center h-full w-full min-h-[200px] bg-muted/30 rounded-lg p-6">
     <p className="text-muted-foreground text-center">
       This file type is not supported for preview.
       <br />
@@ -24,7 +24,7 @@ export const ErrorView = ({
   fileUrl: string;
   message: string;
 }) => (
-  <div className="flex flex-col items-center justify-center h-[70vh] bg-muted/10 rounded-lg p-6">
+  <div className="flex flex-col items-center justify-center h-[70vh] w-full bg-muted/10 rounded-lg p-6">
     <div className="text-red-500 mb-4 text-center">
       {message || "Error loading preview."}
     </div>
@@ -217,7 +217,7 @@ const OfficeViewer = ({
   }
 
   return (
-    <div className="rounded-lg overflow-hidden border bg-white h-[70vh] relative">
+    <div className="rounded-lg overflow-hidden border bg-white h-[70vh] w-full relative">
       <iframe
         src={viewers[viewerIndex]}
         className="w-full h-full"
@@ -281,7 +281,7 @@ export default function FileViewerClient({
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-[70vh] bg-muted/10 rounded-lg">
+      <div className="flex items-center justify-center h-[70vh] w-full max-w-full bg-muted/10 rounded-lg">
         <div className="animate-pulse text-muted-foreground">
           Loading preview...
         </div>
@@ -298,7 +298,7 @@ export default function FileViewerClient({
   switch (fileType) {
     case "image":
       return (
-        <div className="flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden h-[70vh] w-[90vw]">
+        <div className="flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden h-[70vh] w-full">
           <Image
             src={fileUrl}
             alt={filename}
@@ -317,7 +317,7 @@ export default function FileViewerClient({
     case "code":
       if (textContent) {
         return (
-          <div className="rounded-lg overflow-hidden h-[70vh]">
+          <div className="rounded-lg overflow-hidden h-[70vh] w-full">
             <pre className="bg-muted rounded-md p-4 overflow-auto h-full whitespace-pre-wrap text-sm">
               {textContent}
             </pre>
@@ -330,7 +330,7 @@ export default function FileViewerClient({
 
     case "audio":
       return (
-        <div className="flex flex-col items-center justify-center space-y-4 bg-muted/10 rounded-lg p-6 h-[70vh] w-[90vw]">
+        <div className="flex flex-col items-center justify-center space-y-4 bg-muted/10 rounded-lg p-6 h-[70vh] w-full">
           <div className="text-center mb-2">
             <span className="text-sm text-muted-foreground">Audio File</span>
           </div>
@@ -343,7 +343,7 @@ export default function FileViewerClient({
 
     case "video":
       return (
-        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-[90vw]">
+        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-full">
           <video
             controls
             className="w-full h-full object-contain"
@@ -359,7 +359,7 @@ export default function FileViewerClient({
     case "excel":
     case "powerpoint":
       return (
-        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-[90vw]">
+        <div className="rounded-lg overflow-hidden bg-black h-[70vh] w-full">
           <OfficeViewer
             fileUrl={fileUrl}
             filename={filename}
