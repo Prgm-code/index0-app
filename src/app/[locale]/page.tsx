@@ -40,10 +40,7 @@ export default async function Home() {
               <UserButton />
             </SignedIn>
             <SignedOut>
-              <SignInButton
-                mode="modal"
-                fallbackRedirectUrl="/redirect-after-signin"
-              >
+              <SignInButton mode="modal">
                 <Button
                   variant="ghost"
                   className=" hover:text-white/80 animate-fade-in animate-delay-100 bg-white/80 text-purple-900 hover:bg-white/30 cursor-pointer"
@@ -83,10 +80,7 @@ export default async function Home() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <SignedOut>
-                    <SignUpButton
-                      mode="modal"
-                      fallbackRedirectUrl="/redirect-after-signin"
-                    >
+                    <SignUpButton mode="modal">
                       <Button
                         size="lg"
                         className="w-full sm:w-auto bg-white text-purple-900 hover:bg-white/90 animate-jump animate-delay-600"
