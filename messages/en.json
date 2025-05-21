@@ -256,6 +256,8 @@
     "size": "Size",
     "score": "Match Score",
     "semanticSearchTitle": "Advanced Semantic Search",
-    "semanticSearchDescription": "This search uses vector technology to find documents semantically similar to your query. The system analyzes the meaning of your question and finds relevant fragments based on conceptual similarity, not just exact word matches."
+    "semanticSearchDescription": "This search uses vector technology to find documents semantically similar to your query. The system analyzes the meaning of your question and finds relevant fragments based on conceptual similarity, not just exact word matches.",
+    "indexingMessage": "Indexing may take up to 4 hours",
+    "indexingTooltip": "The generation of embeddings for use in chat and smart search functionality can take up to 4 hours to complete after uploading files."
   }
 }

@@ -17,6 +17,7 @@ import {
   Trash2,
   Plus,
   X,
+  AlertCircle,
 } from "lucide-react";
 import { FileCard } from "@/components/file-card";
 import { FolderCard } from "@/components/folder-card";
@@ -33,6 +34,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useTranslations } from "next-intl";
 import { createFolder, deleteFolder } from "@/actions/FolderActions";
 import { deleteFile, listFiles } from "@/actions/FileActions";
@@ -487,6 +494,20 @@ export default function Dashboard() {
                 {t("smartSearch") || "Smart Search"}
               </Button>
             </div>
+            {/* Display indexing message with tooltip */}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center text-xs text-muted-foreground">
+                    <AlertCircle className="h-4 w-4 mr-1 text-amber-500" />
+                    {t("indexingMessage")}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p>{t("indexingTooltip")}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
 
           {/* Breadcrumb */}
