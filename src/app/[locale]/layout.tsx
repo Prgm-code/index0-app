@@ -21,53 +21,53 @@ const geistMono = Geist_Mono({
 });
 
 // Base metadata that will be overridden by generateMetadata
-// export const metadata: Metadata = {
-//   title: "Index0",
-//   description:
-//     "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
-// };
+export const metadata: Metadata = {
+  title: "Index0",
+  description:
+    "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+};
 
-// Dynamic metadata generator based on locale
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
+// // Dynamic metadata generator based on locale
+// export async function generateMetadata({
+//   params,
+// }: {
+//   params: Promise<{ locale: string }>;
+// }): Promise<Metadata> {
+//   const { locale } = await params;
 
-  // Convert locale to OpenGraph format (e.g., 'es' to 'es_MX', 'en' to 'en_US')
-  const ogLocale = locale === "en" ? "en_US" : "es_MX";
+//   // Convert locale to OpenGraph format (e.g., 'es' to 'es_MX', 'en' to 'en_US')
+//   const ogLocale = locale === "en" ? "en_US" : "es_MX";
 
-  return {
-    title: "Index0",
-    description:
-      "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
-    openGraph: {
-      type: "website",
-      locale: ogLocale,
-      url: "https://www.index0.cc",
-      title: "Index0",
-      description:
-        "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
-      siteName: "Index0",
-      images: [
-        {
-          url: locale === "en" ? "/og_en.png" : "/og_en.png",
-          width: 945,
-          height: 630,
-          alt: "Index0",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: "Index0",
-      description:
-        "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
-      images: [locale === "en" ? "/og_en.png" : "/og_es.png"],
-    },
-  };
-}
+//   return {
+//     title: "Index0",
+//     description:
+//       "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+//     openGraph: {
+//       type: "website",
+//       locale: ogLocale,
+//       url: "https://www.index0.cc",
+//       title: "Index0",
+//       description:
+//         "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+//       siteName: "Index0",
+//       images: [
+//         {
+//           url: locale === "en" ? "/og_en.png" : "/og_en.png",
+//           width: 945,
+//           height: 630,
+//           alt: "Index0 – Almacenamiento inteligente de documentos",
+//         },
+//       ],
+//     },
+//     twitter: {
+//       card: "summary_large_image",
+//       title: "Index0 – Almacenamiento inteligente de documentos",
+//       description:
+//         "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
+//       images: [locale === "en" ? "/og_en.png" : "/og_en.png"],
+//     },
+//   };
+// }
 
 export default async function RootLayout({
   children,
