@@ -132,9 +132,10 @@
   },
   "features": {
     "title": "Características principales",
+    "detailedTitle": "Cómo funciona",
     "organization": {
       "title": "Organización intuitiva",
-      "description": "Estructura de carpetas familiar e intuitiva, similar a iOS, para que te sientas como en casa"
+      "description": "Sistema de organización inteligente y familiar que facilita la gestión de tus documentos"
     },
     "indexing": {
       "title": "Indexación con IA",
@@ -143,11 +144,49 @@
     "search": {
       "title": "Búsqueda potente",
       "description": "Encuentra cualquier documento o información específica en segundos, incluso dentro del contenido"
+    },
+    "detailed": {
+      "storage": {
+        "title": "Almacenamiento y Carga Seguros",
+        "features": {
+          "0": "Espacio de carpetas privado para cada usuario autenticado",
+          "1": "Soporte para arrastrar y soltar múltiples formatos de archivo",
+          "2": "Gestión inteligente del tamaño de archivos con límites configurables",
+          "3": "Almacenamiento seguro en la nube con Cloudflare R2"
+        }
+      },
+      "indexing": {
+        "title": "Indexación Inteligente",
+        "features": {
+          "0": "Extracción automática de metadatos",
+          "1": "Vectorización avanzada de texto e imágenes",
+          "2": "Procesamiento inteligente de contenido",
+          "3": "Actualizaciones de indexación en tiempo real"
+        }
+      },
+      "search": {
+        "title": "Búsqueda Semántica",
+        "features": {
+          "0": "Consultas en lenguaje natural",
+          "1": "Coincidencia por similitud semántica",
+          "2": "Fragmentos de texto relevantes",
+          "3": "Opciones avanzadas de filtrado"
+        }
+      },
+      "assistant": {
+        "title": "Asistente Conversacional con IA",
+        "features": {
+          "0": "Conversaciones naturales sobre tus documentos",
+          "1": "Respuestas contextuales potenciadas por RAG",
+          "2": "Referencias a documentos fuente",
+          "3": "Trazabilidad completa"
+        }
+      }
     }
   },
   "cta": {
-    "title": "Prueba todas las capacidades",
-    "description": "Explora nuestra demo interactiva para ver cómo Index0 puede transformar la forma en que gestionas tus documentos",
+    "title": "Comienza con el Plan Starter",
+    "description": "Prueba Index0 gratis con 200MB de almacenamiento y todas las funcionalidades principales",
     "button": "Acceder a la demo completa"
   },
   "footer": {

@@ -132,9 +132,10 @@
   },
   "features": {
     "title": "Main features",
+    "detailedTitle": "How it works",
     "organization": {
       "title": "Intuitive organization",
-      "description": "Familiar and intuitive folder structure, similar to iOS, to make you feel at home"
+      "description": "Smart and familiar organization system that makes document management easy"
     },
     "indexing": {
       "title": "AI Indexing",
@@ -143,11 +144,49 @@
     "search": {
       "title": "Powerful search",
       "description": "Find any document or specific information in seconds, even within content"
+    },
+    "detailed": {
+      "storage": {
+        "title": "Secure Storage & Upload",
+        "features": {
+          "0": "Private folder space for each authenticated user",
+          "1": "Drag & drop support for multiple file formats",
+          "2": "Smart file size management with configurable limits",
+          "3": "Secure cloud storage with Cloudflare R2"
+        }
+      },
+      "indexing": {
+        "title": "Smart Indexing",
+        "features": {
+          "0": "Automatic metadata extraction",
+          "1": "Advanced text and image vectorization",
+          "2": "Intelligent content processing",
+          "3": "Real-time indexing updates"
+        }
+      },
+      "search": {
+        "title": "Semantic Search",
+        "features": {
+          "0": "Natural language queries",
+          "1": "Semantic similarity matching",
+          "2": "Relevant text snippets",
+          "3": "Advanced filtering options"
+        }
+      },
+      "assistant": {
+        "title": "AI Conversational Assistant",
+        "features": {
+          "0": "Natural conversations about your documents",
+          "1": "RAG-powered contextual responses",
+          "2": "Source document references",
+          "3": "Complete traceability"
+        }
+      }
     }
   },
   "cta": {
-    "title": "Try all capabilities",
-    "description": "Explore our interactive demo to see how Index0 can transform the way you manage your documents",
+    "title": "Start with the Starter Plan",
+    "description": "Try Index0 for free with 200MB storage and all core features",
     "button": "Access full demo"
   },
   "footer": {
