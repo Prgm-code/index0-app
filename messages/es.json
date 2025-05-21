@@ -256,6 +256,8 @@
     "size": "Tamaño",
     "score": "Puntuación de coincidencia",
     "semanticSearchTitle": "Búsqueda Semántica Avanzada",
-    "semanticSearchDescription": "Esta búsqueda utiliza tecnología vectorial para encontrar documentos semánticamente similares a tu consulta. El sistema analiza el significado de tu pregunta y encuentra fragmentos relevantes basados en similitud conceptual, no solo coincidencias de palabras exactas."
+    "semanticSearchDescription": "Esta búsqueda utiliza tecnología vectorial para encontrar documentos semánticamente similares a tu consulta. El sistema analiza el significado de tu pregunta y encuentra fragmentos relevantes basados en similitud conceptual, no solo coincidencias de palabras exactas.",
+    "indexingMessage": "La indexación puede tomar hasta 4 horas",
+    "indexingTooltip": "La generación de embeddings para usar en chat y búsqueda inteligente puede tardar hasta 4 horas en completarse después de subir archivos."
   }
 }
