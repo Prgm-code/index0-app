@@ -9,6 +9,54 @@
     "pricing": "Precios",
     "contact": "Contacto"
   },
+  "fileViewer": {
+    "search": {
+      "placeholder": "Buscar por nombre de archivo...",
+      "label": "Buscar archivos"
+    },
+    "searchFiles": "Buscar Archivos",
+    "searchPlaceholder": "Encuentra rápidamente tus archivos almacenados",
+    "items": "{count} elementos",
+    "noResults": "No se encontraron archivos que coincidan con tu búsqueda.",
+    "unauthorized": "No autorizado",
+    "loadError": "Error al cargar archivos: {error}",
+    "table": {
+      "name": "Nombre",
+      "size": "Tamaño",
+      "uploaded": "Subido",
+      "actions": "Acciones",
+      "view": "Ver",
+      "download": "Descargar"
+    },
+    "fileInfo": {
+      "title": "Información del Archivo",
+      "size": "Tamaño",
+      "lastModified": "Última Modificación",
+      "contentType": "Tipo de Contenido",
+      "fileType": "Tipo de Archivo"
+    },
+    "fileTypes": {
+      "pdf": "Documento PDF",
+      "doc": "Documento Word",
+      "docx": "Documento Word",
+      "xls": "Hoja de Cálculo Excel",
+      "xlsx": "Hoja de Cálculo Excel",
+      "jpg": "Imagen JPEG",
+      "jpeg": "Imagen JPEG",
+      "png": "Imagen PNG",
+      "gif": "Imagen GIF",
+      "txt": "Archivo de Texto",
+      "unknown": "Desconocido"
+    },
+    "sizeUnits": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB",
+      "tb": "TB"
+    },
+    "resultsPerPage": "Resultados por página"
+  },
   "chat": {
     "title": "Asistente Index0",
     "description": "Pregúntame cualquier cosa sobre tus documentos almacenados",
@@ -42,8 +90,14 @@
       "tags": "Etiquetas",
       "trash": "Papelera"
     },
+    "files": {
+      "title": "Gestión de Archivos",
+      "manage": "Gestionar Archivos",
+      "search": "Búsqueda con IA",
+      "view": "Buscar Archivos"
+    },
     "folders": {
-      "title": "Mis Carpetas",
+      "title": "Menú Principal",
       "work": "Trabajo",
       "personal": "Personal",
       "projects": "Proyectos"
@@ -157,6 +211,12 @@
     "searchError": "Error al buscar archivos",
     "searchResults": "Resultados de búsqueda",
     "pressEnterOrClick": "Presiona Enter para buscar o haz clic en el botón",
-    "search": "Buscar"
+    "search": "Buscar",
+    "smartSearch": "Búsqueda Inteligente",
+    "name": "Nombre",
+    "size": "Tamaño",
+    "score": "Puntuación de coincidencia",
+    "semanticSearchTitle": "Búsqueda Semántica Avanzada",
+    "semanticSearchDescription": "Esta búsqueda utiliza tecnología vectorial para encontrar documentos semánticamente similares a tu consulta. El sistema analiza el significado de tu pregunta y encuentra fragmentos relevantes basados en similitud conceptual, no solo coincidencias de palabras exactas."
   }
 }

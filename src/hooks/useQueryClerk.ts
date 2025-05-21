@@ -10,5 +10,8 @@ export const useQueryClerk = () => {
   return useQuery({
     queryKey: ["userMetadata"],
     queryFn: () => getUserMetadata(user?.id ?? ""),
+    enabled: !!user?.id,
+    staleTime: 1000 * 60 * 60 * 24,
+    refetchOnWindowFocus: false,
   });
 };

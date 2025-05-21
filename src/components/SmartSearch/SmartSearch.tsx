@@ -4,7 +4,7 @@ import { TailSpin } from "react-loader-spinner";
 import { useTranslations } from "next-intl";
 import { toast } from "@pheralb/toast";
 import { searchFiles } from "@/actions/SearchActions";
-import { VectorSearchResponse } from "@/app/[locale]/[userSession]/page";
+import { VectorSearchResponse } from "@/interfaces/SmartSearch";
 import { useLocale } from "next-intl";
 
 interface SmartSearchProps {
@@ -72,8 +72,17 @@ export function SmartSearch({
   };
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="relative flex items-center">
+    <div className="w-full mb-6">
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold mb-2">
+          {t("semanticSearchTitle")}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          {t("semanticSearchDescription")}
+        </p>
+      </div>
+
+      <div className="relative flex items-center w-full max-w-full">
         <div className="absolute left-3 z-10">
           {isLoading ? (
             <TailSpin
