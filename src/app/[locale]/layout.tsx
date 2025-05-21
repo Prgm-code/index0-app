@@ -45,7 +45,7 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       locale: ogLocale,
-      url: "https://www.index0.app",
+      url: "https://www.index0.cc",
       title: "Index0",
       description:
         "Index0 is a document management system with an AI assistant powered by RAG technology that retrieves information from your indexed files.",
