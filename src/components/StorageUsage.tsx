@@ -23,6 +23,7 @@ export function StorageUsage({
   const t = useTranslations("menu");
 
   const { data: userMetadata, isLoading } = useQueryClerk();
+  console.log(userMetadata);
 
   // Cálculo de uso en MB y porcentaje
   const usedBytes = Number(userMetadata?.filesSize ?? 0);

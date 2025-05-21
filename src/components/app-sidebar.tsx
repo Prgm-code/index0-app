@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { StorageUsage } from "./StorageUsage";
 
 const GelymarLogo: React.FC = () => {
   return (
@@ -49,10 +50,12 @@ export function AppSidebar({
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain
+        <StorageUsage isIconMode={isIconMode} isFullyExpanded={!isIconMode} />
+
+        {/* <NavMain
           items={data.navMain}
           collapsible={isIconMode ? "icon" : "offcanvas"}
-        />
+        /> */}
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

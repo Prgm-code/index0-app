@@ -303,14 +303,20 @@ export default function FileViewerClient({
     case "image":
       return (
         <div className="flex items-center justify-center bg-muted/10 rounded-lg overflow-hidden h-[70vh] w-full">
-          <Image
-            src={fileUrl}
-            alt={filename}
-            width={1200}
-            height={800}
-            className="max-w-full max-h-[70vh] h-auto object-contain"
-            unoptimized
-          />
+          {fileUrl ? (
+            <Image
+              src={fileUrl}
+              alt={filename}
+              width={1200}
+              height={800}
+              className="max-w-full max-h-[70vh] h-auto object-contain"
+              unoptimized
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full w-full">
+              <p className="text-muted-foreground">No image found</p>
+            </div>
+          )}
         </div>
       );
 

@@ -26,6 +26,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function NavProjects({
   projects,
@@ -69,10 +70,10 @@ export function NavProjects({
             {items.map((item) => (
               <SidebarMenuItem key={item.name}>
                 <SidebarMenuButton asChild tooltip={item.name}>
-                  <a href={item.url}>
+                  <Link href={item.url || ""} shallow>
                     {item.icon && <item.icon />}
                     <span>{item.name}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
                 {item.url && (
                   <DropdownMenu>

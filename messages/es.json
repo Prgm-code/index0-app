@@ -9,6 +9,54 @@
     "pricing": "Precios",
     "contact": "Contacto"
   },
+  "fileViewer": {
+    "search": {
+      "placeholder": "Buscar por nombre de archivo...",
+      "label": "Buscar archivos"
+    },
+    "searchFiles": "Buscar Archivos",
+    "searchPlaceholder": "Encuentra rápidamente tus archivos almacenados",
+    "items": "{count} elementos",
+    "noResults": "No se encontraron archivos que coincidan con tu búsqueda.",
+    "unauthorized": "No autorizado",
+    "loadError": "Error al cargar archivos: {error}",
+    "table": {
+      "name": "Nombre",
+      "size": "Tamaño",
+      "uploaded": "Subido",
+      "actions": "Acciones",
+      "view": "Ver",
+      "download": "Descargar"
+    },
+    "fileInfo": {
+      "title": "Información del Archivo",
+      "size": "Tamaño",
+      "lastModified": "Última Modificación",
+      "contentType": "Tipo de Contenido",
+      "fileType": "Tipo de Archivo"
+    },
+    "fileTypes": {
+      "pdf": "Documento PDF",
+      "doc": "Documento Word",
+      "docx": "Documento Word",
+      "xls": "Hoja de Cálculo Excel",
+      "xlsx": "Hoja de Cálculo Excel",
+      "jpg": "Imagen JPEG",
+      "jpeg": "Imagen JPEG",
+      "png": "Imagen PNG",
+      "gif": "Imagen GIF",
+      "txt": "Archivo de Texto",
+      "unknown": "Desconocido"
+    },
+    "sizeUnits": {
+      "bytes": "Bytes",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB",
+      "tb": "TB"
+    },
+    "resultsPerPage": "Resultados por página"
+  },
   "chat": {
     "title": "Asistente Index0",
     "description": "Pregúntame cualquier cosa sobre tus documentos almacenados",
@@ -42,8 +90,14 @@
       "tags": "Etiquetas",
       "trash": "Papelera"
     },
+    "files": {
+      "title": "Gestión de Archivos",
+      "manage": "Gestionar Archivos",
+      "search": "Búsqueda con IA",
+      "view": "Buscar Archivos"
+    },
     "folders": {
-      "title": "Mis Carpetas",
+      "title": "Menú Principal",
       "work": "Trabajo",
       "personal": "Personal",
       "projects": "Proyectos"
@@ -78,9 +132,10 @@
   },
   "features": {
     "title": "Características principales",
+    "detailedTitle": "Cómo funciona",
     "organization": {
       "title": "Organización intuitiva",
-      "description": "Estructura de carpetas familiar e intuitiva, similar a iOS, para que te sientas como en casa"
+      "description": "Sistema de organización inteligente y familiar que facilita la gestión de tus documentos"
     },
     "indexing": {
       "title": "Indexación con IA",
@@ -89,11 +144,49 @@
     "search": {
       "title": "Búsqueda potente",
       "description": "Encuentra cualquier documento o información específica en segundos, incluso dentro del contenido"
+    },
+    "detailed": {
+      "storage": {
+        "title": "Almacenamiento y Carga Seguros",
+        "features": {
+          "0": "Espacio de carpetas privado para cada usuario autenticado",
+          "1": "Soporte para arrastrar y soltar múltiples formatos de archivo",
+          "2": "Gestión inteligente del tamaño de archivos con límites configurables",
+          "3": "Almacenamiento seguro en la nube con Cloudflare R2"
+        }
+      },
+      "indexing": {
+        "title": "Indexación Inteligente",
+        "features": {
+          "0": "Extracción automática de metadatos",
+          "1": "Vectorización avanzada de texto e imágenes",
+          "2": "Procesamiento inteligente de contenido",
+          "3": "Actualizaciones de indexación en tiempo real"
+        }
+      },
+      "search": {
+        "title": "Búsqueda Semántica",
+        "features": {
+          "0": "Consultas en lenguaje natural",
+          "1": "Coincidencia por similitud semántica",
+          "2": "Fragmentos de texto relevantes",
+          "3": "Opciones avanzadas de filtrado"
+        }
+      },
+      "assistant": {
+        "title": "Asistente Conversacional con IA",
+        "features": {
+          "0": "Conversaciones naturales sobre tus documentos",
+          "1": "Respuestas contextuales potenciadas por RAG",
+          "2": "Referencias a documentos fuente",
+          "3": "Trazabilidad completa"
+        }
+      }
     }
   },
   "cta": {
-    "title": "Prueba todas las capacidades",
-    "description": "Explora nuestra demo interactiva para ver cómo Index0 puede transformar la forma en que gestionas tus documentos",
+    "title": "Comienza con el Plan Starter",
+    "description": "Prueba Index0 gratis con 200MB de almacenamiento y todas las funcionalidades principales",
     "button": "Acceder a la demo completa"
   },
   "footer": {
@@ -157,6 +250,12 @@
     "searchError": "Error al buscar archivos",
     "searchResults": "Resultados de búsqueda",
     "pressEnterOrClick": "Presiona Enter para buscar o haz clic en el botón",
-    "search": "Buscar"
+    "search": "Buscar",
+    "smartSearch": "Búsqueda Inteligente",
+    "name": "Nombre",
+    "size": "Tamaño",
+    "score": "Puntuación de coincidencia",
+    "semanticSearchTitle": "Búsqueda Semántica Avanzada",
+    "semanticSearchDescription": "Esta búsqueda utiliza tecnología vectorial para encontrar documentos semánticamente similares a tu consulta. El sistema analiza el significado de tu pregunta y encuentra fragmentos relevantes basados en similitud conceptual, no solo coincidencias de palabras exactas."
   }
 }

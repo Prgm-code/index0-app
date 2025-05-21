@@ -251,3 +251,65 @@ export async function getFileMetadata(data: { key: string; clerkId: string }) {
     };
   }
 }
+
+export async function getAllFiles(data: { clerkId: string }) {
+  try {
+    const [sessionClaims, client] = await Promise.all([auth(), clerkClient()]);
+
+    if (sessionClaims?.userId !== data.clerkId) {
+      return { error: "Unauthorized", success: false };
+    }
+
+    if (
+      !process.env.S3_ENDPOINT ||
+      !process.env.S3_ACCESS_KEY_ID ||
+      !process.env.S3_SECRET_ACCESS_KEY ||
+      !BUCKET
+    ) {
+      throw new Error(
+        "Missing required environment variables for R2 configuration"
+      );
+    }
+
+    const command = new ListObjectsV2Command({
+      Bucket: BUCKET,
+      Prefix: `${data.clerkId}/`,
+    });
+
+    const response = await s3.send(command);
+
+    const files = (response.Contents || [])
+      .filter((item) => item.Key && item.Key !== `${data.clerkId}/`)
+      .map((item) => ({
+        key: item.Key || "",
+        size: item.Size || 0,
+        lastModified:
+          item.LastModified?.toISOString() ?? new Date().toISOString(),
+        type: "file",
+      }));
+
+    // Cálculo del tamaño total
+    const totalSizeBytes = files.reduce((sum, f) => sum + f.size, 0);
+    const totalSize = formatBytes(totalSizeBytes);
+
+    await client.users.updateUserMetadata(data.clerkId, {
+      privateMetadata: {
+        filesSize: totalSizeBytes,
+        maxStorage: MAX_STORAGE,
+      },
+    });
+
+    return {
+      success: true,
+      files,
+      totalSizeBytes,
+      totalSize,
+    };
+  } catch (error: any) {
+    console.error("Error fetching all files:", error);
+    return {
+      error: error.message || "Failed to fetch all files",
+      success: false,
+    };
+  }
+}

@@ -171,6 +171,132 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Detailed Features Section */}
+        <section className="py-16 px-6 view-animate-fade-up">
+          <div className="container mx-auto max-w-6xl">
+            <h2 className="text-3xl font-bold text-center mb-12 text-white animate-fade-in">
+              {t("features.detailedTitle") || "How It Works"}
+            </h2>
+            <div className="grid md:grid-cols-2 gap-12">
+              {/* Secure Storage */}
+              <div className="space-y-6 bg-white/5 backdrop-blur p-8 rounded-lg border border-white/10 animate-fade-up">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white">
+                  {t("features.detailed.storage.title")}
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li>• {t("features.detailed.storage.features.0")}</li>
+                  <li>• {t("features.detailed.storage.features.1")}</li>
+                  <li>• {t("features.detailed.storage.features.2")}</li>
+                  <li>• {t("features.detailed.storage.features.3")}</li>
+                </ul>
+              </div>
+
+              {/* Automatic Indexing */}
+              <div className="space-y-6 bg-white/5 backdrop-blur p-8 rounded-lg border border-white/10 animate-fade-up animate-delay-100">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 7v10c0 2 1 3 3 3h10c2 0 3-1 3-3V7c0-2-1-3-3-3H7c-2 0-3 1-3 3z M9 17v-6 M12 17v-4 M15 17v-2"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white">
+                  {t("features.detailed.indexing.title")}
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li>• {t("features.detailed.indexing.features.0")}</li>
+                  <li>• {t("features.detailed.indexing.features.1")}</li>
+                  <li>• {t("features.detailed.indexing.features.2")}</li>
+                  <li>• {t("features.detailed.indexing.features.3")}</li>
+                </ul>
+              </div>
+
+              {/* Semantic Search */}
+              <div className="space-y-6 bg-white/5 backdrop-blur p-8 rounded-lg border border-white/10 animate-fade-up animate-delay-200">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white">
+                  {t("features.detailed.search.title")}
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li>• {t("features.detailed.search.features.0")}</li>
+                  <li>• {t("features.detailed.search.features.1")}</li>
+                  <li>• {t("features.detailed.search.features.2")}</li>
+                  <li>• {t("features.detailed.search.features.3")}</li>
+                </ul>
+              </div>
+
+              {/* AI Assistant */}
+              <div className="space-y-6 bg-white/5 backdrop-blur p-8 rounded-lg border border-white/10 animate-fade-up animate-delay-300">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-purple-300"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-white">
+                  {t("features.detailed.assistant.title")}
+                </h3>
+                <ul className="space-y-3 text-white/70">
+                  <li>• {t("features.detailed.assistant.features.0")}</li>
+                  <li>• {t("features.detailed.assistant.features.1")}</li>
+                  <li>• {t("features.detailed.assistant.features.2")}</li>
+                  <li>• {t("features.detailed.assistant.features.3")}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* CTA Section */}
         <SignedIn>
           <div className="mt-16 text-center px-6 view-animate-fade-up">

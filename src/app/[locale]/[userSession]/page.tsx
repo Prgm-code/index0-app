@@ -38,34 +38,10 @@ import { createFolder, deleteFolder } from "@/actions/FolderActions";
 import { deleteFile, listFiles } from "@/actions/FileActions";
 import { searchFiles } from "@/actions/SearchActions";
 import { toast } from "@pheralb/toast";
-import { SmartSearch } from "@/components/FileComponents/SmartSearch";
 import { FileList } from "@/components/FileComponents/FileList";
-import { SearchResponse } from "@/components/FileComponents/SearchResponse";
 import { useRouter, useParams } from "next/navigation";
 
 // Define interfaces needed for file management
-export interface VectorSearchResponse {
-  object: string;
-  search_query: string;
-  response: string;
-  data: Array<{
-    file_id: string;
-    filename: string;
-    score: number;
-    content: Array<{
-      id: string;
-      type: string;
-      text: string;
-    }>;
-    attributes: {
-      timestamp: number;
-      folder: string;
-    };
-  }>;
-  has_more: boolean;
-  next_page: string | null;
-}
-
 export interface FileItem {
   key: string;
   size: number;
@@ -122,7 +98,6 @@ export default function Dashboard() {
   const [isDeletingItem, setIsDeletingItem] = useState<string | null>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [localFilter, setLocalFilter] = useState("");
-  const [typedData, setTypedData] = useState<VectorSearchResponse | null>(null);
 
   // Load files from API
   const loadFiles = useCallback(
@@ -400,6 +375,11 @@ export default function Dashboard() {
     loadFiles(fullPath);
   };
 
+  // Navigation to SmartSearch page
+  const navigateToSmartSearch = () => {
+    router.push(`/${params.locale}/${params.userSession}/smart`);
+  };
+
   return (
     <Card className="w-full flex">
       {/* Main content */}
@@ -407,12 +387,6 @@ export default function Dashboard() {
         {/* Top navigation */}
         <header className="border-b bg-background">
           <div className="flex items-center justify-between p-4">
-            <SmartSearch
-              onSearchResults={setTypedData}
-              onError={setError}
-              onSetItems={setItems}
-              currentItems={items}
-            />
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -503,6 +477,15 @@ export default function Dashboard() {
                   </form>
                 </PopoverContent>
               </Popover>
+              {/* Add Smart Search button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={navigateToSmartSearch}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {t("smartSearch") || "Smart Search"}
+              </Button>
             </div>
           </div>
 
@@ -560,8 +543,6 @@ export default function Dashboard() {
                 searchTerm={localFilter}
                 onSearchTermChange={setLocalFilter}
               />
-
-              {typedData && <SearchResponse data={typedData} />}
             </>
           )}
         </main>

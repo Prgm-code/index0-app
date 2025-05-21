@@ -16,7 +16,19 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-import { Briefcase, User, FolderGit2, Home, Folder } from "lucide-react";
+import {
+  Briefcase,
+  User,
+  FolderGit2,
+  Home,
+  Folder,
+  Upload,
+  Search,
+  FileText,
+  FolderIcon,
+  Sparkles,
+  FileSearch,
+} from "lucide-react";
 
 import { useTranslations } from "next-intl";
 import { useSession } from "@clerk/nextjs";
@@ -142,23 +154,23 @@ const getSidebarData = (userSession: string, t: any) => {
     ],
     projects: [
       {
-        name: t("folders.title"),
+        name: t("files.title"),
         category: true,
       },
       {
-        name: t("folders.work"),
-        url: `/client/${userSession}`,
-        icon: Briefcase,
+        name: t("files.manage"),
+        url: `/${userSession}`,
+        icon: FolderIcon,
       },
       {
-        name: t("folders.personal"),
-        url: `/client/${userSession}`,
-        icon: User,
+        name: t("files.search"),
+        url: `/${userSession}/smart`,
+        icon: Sparkles,
       },
       {
-        name: t("folders.projects"),
-        url: `/client/${userSession}`,
-        icon: FolderGit2,
+        name: t("files.view"),
+        url: `/${userSession}/files`,
+        icon: FileSearch,
       },
     ],
   };

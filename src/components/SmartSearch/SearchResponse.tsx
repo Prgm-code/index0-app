@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { FileIcon } from "./FileIcon";
-import { VectorSearchResponse } from "@/app/[locale]/[userSession]/page";
+import { FileIcon } from "../FileComponents/FileIcon";
+import { VectorSearchResponse } from "@/interfaces/SmartSearch";
 import { useSession } from "@clerk/nextjs";
 import React from "react";
 
