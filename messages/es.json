@@ -106,7 +106,28 @@
     "description": "Sube Word, PDF, imágenes y más.",
     "selectButton": "Seleccionar archivos",
     "filesReady": "¡Archivos listos!",
-    "uploadingAlert": "📂 Subiendo {count} archivo(s)..."
+    "filesSelected": "Archivos seleccionados",
+    "filesUploaded": "Archivos subidos",
+    "uploadingAlert": "📂 Subiendo {count} archivo(s)...",
+    "upload": "Subir",
+    "uploading": "Subiendo",
+    "progress": "Progreso",
+    "of": "de",
+    "goToApp": "Ir a la aplicación",
+    "errors": {
+      "userNotIdentified": "No se pudo cargar el archivo. Usuario no identificado.",
+      "invalidPath": "Ruta de archivo inválida",
+      "initError": "Error durante la inicialización",
+      "connectionError": "Error de conexión",
+      "uploadError": "Error durante la carga",
+      "serverError": "Error en la respuesta del servidor",
+      "completeError": "Error al completar la carga",
+      "uploadRetry": "Error al subir el archivo. Inténtelo de nuevo.",
+      "uploadFailed": "Error al subir archivos"
+    },
+    "successMessages": {
+      "filesUploaded": "Archivos subidos exitosamente"
+    }
   },
   "dashboard": {
     "searchPlaceholder": "Búsqueda de documentos indexados...",

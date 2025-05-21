@@ -105,7 +105,28 @@
     "description": "Upload Word, PDF, images and more.",
     "selectButton": "Select files",
     "filesReady": "Files ready!",
-    "uploadingAlert": "📂 Uploading {count} file(s)..."
+    "filesSelected": "Files selected",
+    "filesUploaded": "Files uploaded",
+    "uploadingAlert": "📂 Uploading {count} file(s)...",
+    "upload": "Upload",
+    "uploading": "Uploading",
+    "progress": "Progress",
+    "of": "of",
+    "goToApp": "Go to app",
+    "errors": {
+      "userNotIdentified": "Could not upload file. User not identified.",
+      "invalidPath": "Invalid file path",
+      "initError": "Error during initialization",
+      "connectionError": "Connection error",
+      "uploadError": "Error during upload",
+      "serverError": "Error in server response",
+      "completeError": "Error completing the upload",
+      "uploadRetry": "Error uploading file. Please try again.",
+      "uploadFailed": "Failed to upload files"
+    },
+    "successMessages": {
+      "filesUploaded": "Files uploaded successfully"
+    }
   },
   "dashboard": {
     "searchPlaceholder": "Indexed documents search...",
