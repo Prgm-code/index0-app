@@ -25,6 +25,20 @@ export async function generate(
     const stream = createStreamableValue("");
     let buffer = "";
     let currentResponse = "";
+    let isStreamClosed = false;
+
+    // Helper function to safely close the stream only once
+    const safelyCloseStream = () => {
+      if (!isStreamClosed) {
+        try {
+          stream.done();
+          isStreamClosed = true;
+        } catch (e) {
+          console.error("Error closing stream:", e);
+        }
+      }
+    };
+
     const client = await clerkClient();
     const { sessionClaims } = await auth();
     const user = await client.users.getUser(sessionClaims?.sub as string);
@@ -58,8 +72,7 @@ export async function generate(
     }
     // Check if user has exceeded rate limit
     else if (chatRateLimitExceeded) {
-      // Make sure to mark the stream as done before returning an error
-      stream.done();
+      safelyCloseStream();
       return {
         success: false,
         error: `Rate limit exceeded. Please try again after ${chatRateLimitResetDate?.toLocaleString()}`,
@@ -87,8 +100,7 @@ export async function generate(
 
       // If the user just exceeded the limit, throw error
       if (isExceeded) {
-        // Make sure to mark the stream as done before returning an error
-        stream.done();
+        safelyCloseStream();
         return {
           success: false,
           type: "rate_limit_exceeded",
@@ -106,8 +118,7 @@ export async function generate(
     folders.push(rootFolder);
 
     if (!folders) {
-      // Make sure to mark the stream as done before returning an error
-      stream.done();
+      safelyCloseStream();
       return { success: false, error: "No folder found" };
     }
     // console.log(folders);
@@ -169,13 +180,13 @@ export async function generate(
 
         if (!response.ok) {
           stream.update("Error: " + response.statusText);
-          stream.done();
+          safelyCloseStream();
           throw new Error(`Error in search: ${response.statusText}`);
         }
 
         if (!response.body) {
           stream.update("Error: No response body");
-          stream.done();
+          safelyCloseStream();
           throw new Error("No response body");
         }
 
@@ -259,19 +270,19 @@ export async function generate(
           }
         } finally {
           reader.releaseLock();
+          safelyCloseStream();
         }
       } catch (error) {
         console.error("Stream error:", error);
         stream.update("Error: No se pudo procesar la consulta.");
-        stream.done(); // Make sure to call done() even on error
+        safelyCloseStream();
       }
-
-      stream.done();
     })();
 
     return { output: stream.value, success: true };
   } catch (error: any) {
     console.error("Error in generate function:", error);
+
     return {
       success: false,
       error: error.message || "Error al procesar la consulta",
