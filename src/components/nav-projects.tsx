@@ -75,7 +75,7 @@ export function NavProjects({
                     <span>{item.name}</span>
                   </Link>
                 </SidebarMenuButton>
-                {item.url && (
+                {/* {item.url && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <SidebarMenuAction showOnHover>
@@ -103,7 +103,7 @@ export function NavProjects({
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                )}
+                )} */}
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
