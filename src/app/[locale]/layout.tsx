@@ -10,6 +10,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { unstable_ViewTransition as ViewTransition } from "react";
 import TanstackProvider from "@/providers/TanstackProvider";
+import { Analytics } from "@vercel/analytics/next";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -111,6 +113,7 @@ export default async function RootLayout({
                 <Toaster />
               </ThemeProvider>
             </TanstackProvider>
+            <Analytics />
           </body>
         </html>
       </ClerkProvider>
